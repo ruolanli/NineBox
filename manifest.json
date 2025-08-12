@@ -1,0 +1,57 @@
+{
+  "id": "sylph-day11-vocab",
+  "name": "Day11 · 9词回合训练（词卡·例句·错题本）",
+  "short_name": "Day11词汇",
+  "description": "九词一回合：词卡↔例句，支持发音、翻译开关、错题本与迷你翻译挑战。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0e1021",
+  "background_color": "#0e1021",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "开始训练",
+      "short_name": "开始",
+      "url": "./#train"
+    },
+    {
+      "name": "打开错题本",
+      "short_name": "错题本",
+      "url": "./?mode=wrongbook"
+    }
+  ],
+  "prefer_related_applications": false
+}
