@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Day11 · 9词回合训练｜词卡 + 例句 + 错题本</title>
+<style>
+  :root{
+    --bg:#0e1021;             /* 深色渐变背景 */
+    --bg2:#141734;
+    --txt:#eaf3ff;            /* 主要文字 */
+    --muted:#9fb2c8;          /* 次级文字 */
+    --card:rgba(255,255,255,.08); /* 玻璃卡 */
+    --blur:12px;
+    --stroke:rgba(255,255,255,.18);
+    --accent:#89b4ff;         /* 点缀 */
+    --accent2:#bda7ff;        /* 次点缀 */
+    --ok:#9be4b5;             /* 正向色 */
+    --warn:#ffd68d;           /* 提示色 */
+    --danger:#ff9aa2;         /* 危险色 */
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 60% at 20% -10%, #1a2047 0%, transparent 60%),
+                radial-gradient(1000px 60% at 120% 30%, #172a54 0%, transparent 50%),
+                linear-gradient(180deg,var(--bg),var(--bg2));
+    color:var(--txt);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Hiragino Sans GB",sans-serif;
+  }
+  .app{max-width:1000px;margin:0 auto;padding:20px 16px 28px}
+  header.head{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .title{display:flex;align-items:center;gap:10px}
+  .title h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px}
+  .badge{font-size:12px;padding:4px 8px;border:1px solid var(--stroke);border-radius:999px;background:rgba(255,255,255,.05);color:var(--muted)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{appearance:none;border:1px solid var(--stroke);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));
+       color:var(--txt);padding:8px 12px;border-radius:10px;font-size:14px;cursor:pointer;backdrop-filter:blur(var(--blur));
+       transition:.2s;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px -16px rgba(0,0,0,.6)}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  .btn.primary{border-color:rgba(137,180,255,.4);box-shadow:inset 0 0 0 1px rgba(137,180,255,.28)}
+  .btn.ghost{background:transparent}
+  .tabs{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+  .tabs .tab{padding:6px 12px;border:1px solid var(--stroke);border-radius:999px;font-size:13px;color:var(--muted);cursor:pointer}
+  .tabs .tab.active{color:var(--txt);border-color:rgba(137,180,255,.45);box-shadow:inset 0 0 0 1px rgba(137,180,255,.25)}
+
+  /* 网格卡片 */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.grid{grid-template-columns:1fr}}
+  .card{position:relative;padding:16px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.06));
+        border:1px solid var(--stroke);backdrop-filter:blur(var(--blur));min-height:120px;display:flex;flex-direction:column;gap:8px}
+  .term{font-size:20px;font-weight:800;letter-spacing:.2px;margin:6px 0}
+  .cn{color:var(--ok);font-size:15px;display:none}
+  .cn.show{display:block}
+  .meta{font-size:12px;color:var(--muted)}
+  .toolbar{position:absolute;top:8px;right:8px;display:flex;gap:6px}
+  .iconbtn{border:1px solid var(--stroke);background:rgba(255,255,255,.04);width:34px;height:32px;border-radius:9px;
+           display:grid;place-items:center;color:var(--muted);cursor:pointer}
+  .iconbtn.active{color:var(--accent);box-shadow:inset 0 0 0 1px rgba(137,180,255,.4)}
+  .iconbtn:hover{transform:translateY(-1px)}
+
+  /* 例句区域 */
+  .sentences{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  .sentence{padding:16px 16px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.06));
+            border:1px solid var(--stroke);backdrop-filter:blur(var(--blur));}
+  .en{font-weight:700}
+  .zh{display:none;color:var(--ok)}
+  .zh.show{display:block;margin-top:6px}
+
+  footer.foot{margin-top:16px;display:flex;gap:10px;align-items:center;justify-content:space-between;color:var(--muted)}
+  .meter{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;flex:1}
+  .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
+
+  /* 模态层 */
+  .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(10,12,20,.55);backdrop-filter:blur(6px);z-index:40}
+  .modal.show{display:grid}
+  .dialog{width:min(720px,92vw);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06));
+          border:1px solid var(--stroke);border-radius:16px;padding:18px}
+
+  /* 迷你彩纸 */
+  .burst{position:fixed;pointer-events:none;inset:0;overflow:hidden;z-index:60}
+  .piece{position:absolute;width:8px;height:12px;opacity:0;animation:pop 1s ease-out forwards}
+  @keyframes pop{0%{transform:translate(var(--x),var(--y)) rotate(0) scale(.8);opacity:1}
+                 100%{transform:translate(var(--x2),var(--y2)) rotate(720deg) scale(1);opacity:0}}
+
+  .hint{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="head">
+      <div class="title" id="title">
+        <span class="badge">Day11</span>
+        <h1>9词回合训练 · 词卡 ↔ 例句 · 错题本</h1>
+      </div>
+      <div class="controls">
+        <button class="btn" id="prevBtn">← 上一回合</button>
+        <button class="btn primary" id="toggleViewBtn">切换到例句页</button>
+        <button class="btn" id="nextBtn">下一回合 →</button>
+        <button class="btn ghost" id="showAllBtn">显示全部译文</button>
+        <button class="btn ghost" id="hideAllBtn">隐藏全部译文</button>
+        <button class="btn" id="shuffleBtn">随机顺序</button>
+        <button class="btn" id="wrongTabBtn">错题本</button>
+        <button class="btn" id="deckTabBtn" style="display:none">返回词库</button>
+        <button class="btn" id="miniGameBtn">🎮 翻译挑战</button>
+        <button class="btn ghost" id="eggBtn" title="小惊喜">🎁</button>
+      </div>
+      <div class="hint">提示：点击单词即可<span style="color:var(--ok)">发音 + 显示翻译</span>；📌图钉加入错题本；💬查看例句。</div>
+    </header>
+
+    <section id="wordsView">
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section id="sentencesView" style="display:none">
+      <div class="controls" style="margin-top:4px">
+        <button class="btn" id="shuffleSentBtn">换一组例句</button>
+        <button class="btn ghost" id="showAllZhSent">显示全部译文</button>
+        <button class="btn ghost" id="hideAllZhSent">隐藏全部译文</button>
+      </div>
+      <div class="sentences" id="sentences"></div>
+    </section>
+
+    <footer class="foot">
+      <div id="status">回合 <span id="roundIdx">1</span>/<span id="roundTotal">1</span> · 本回合词数 <span id="roundCount">0</span> · 错题本 <span id="wrongCount">0</span></div>
+      <div class="meter"><div class="bar" id="bar"></div></div>
+    </footer>
+  </div>
+
+  <!-- 例句弹窗 -->
+  <div class="modal" id="exampleModal" aria-hidden="true">
+    <div class="dialog">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <h3 id="exTitle" style="margin:0">例句</h3>
+        <button class="btn" id="closeEx">关闭</button>
+      </div>
+      <div style="margin-top:10px" id="exContent"></div>
+    </div>
+  </div>
+
+  <!-- 迷你挑战弹窗 -->
+  <div class="modal" id="quizModal" aria-hidden="true">
+    <div class="dialog">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <h3 style="margin:0">🎯 翻译挑战（输入中文义）</h3>
+        <button class="btn" id="closeQuiz">关闭</button>
+      </div>
+      <div id="quizWrap" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="burst" id="burst"></div>
+
+<script>
+// —————————— 数据区：词库（唯一词条） ——————————
+const base = [
+  // 每项: term, cn, example.en, example.zh
+  {t:'replace', cn:'替换；更换', ex:['Please replace the old battery to prevent a shutdown during the presentation.','请更换旧电池，以防在演示时关机。']},
+  {t:'favorable', cn:'有利的；有好感的', ex:['The survey results were favorable, so the committee approved the expansion.','调查结果是有利的，因此委员会批准了扩建。']},
+  {t:'addition', cn:'增加；另外；附加物', ex:['In addition to salary, the company offers a reward for innovation.','除了薪资，公司还为创新提供奖励。']},
+  {t:'exist', cn:'存在', ex:['Some problems still exist despite repeated checks.','尽管反复检查，仍然存在一些问题。']},
+
+  {t:'position', cn:'位置；职位；立场', ex:['Her position combines teaching and research, and she is recognized as a major figure in the department.','她的职位兼具教学与科研，并被认为是该系的重要人物。']},
+  {t:'recommend', cn:'推荐；建议', ex:['Doctors often recommend regular exercise to reduce stress.','医生常建议规律运动以缓解压力。']},
+  {t:'tip', cn:'提示；窍门；小费', ex:['Quick tip: separate big goals into small steps to make sense of the process.','小提示：把大目标拆成小步骤，这样更讲得通。']},
+  {t:'affect', cn:'影响（动词）', ex:['Lack of sleep can affect memory and energy during lectures.','睡眠不足会影响上课时的记忆与精力。']},
+
+  {t:'lecture', cn:'讲座；授课', ex:['The professor\'s lecture on contemporary art drew a local crowd despite the rain.','尽管下雨，这位教授关于当代艺术的讲座仍吸引了本地听众。']},
+  {t:'content', cn:'内容；（形容词）满意的', ex:['Please check whether the content of your presentation matches the procedure.','请检查你的演示内容是否符合流程。']},
+  {t:'tend', cn:'倾向于；照料', ex:['People tend to rely on shortcuts, but real progress requires consistency.','人们往往依赖捷径，但真正的进步需要坚持。']},
+  {t:'affection', cn:'喜爱；感情', ex:['He showed deep affection and respect for his grandmother at the memorial.','在追思会上，他表达了对祖母深切的爱与尊重。']},
+
+  {t:'favor', cn:'偏爱；恩惠；帮忙', ex:['Could you do me a favor and confirm the entrance time?','能帮个忙确认一下进门时间吗？']},
+  {t:'prevent', cn:'防止；阻止', ex:['Use strong passwords to prevent people from trying to steal your data.','使用强密码以防他人试图偷取你的数据。']},
+  {t:'coverage', cn:'覆盖范围；新闻报道', ex:['The news coverage praised the charity\'s donation and impact.','新闻报道赞扬了该慈善机构的捐赠及其影响。']},
+  {t:'presentation', cn:'演示；报告', ex:['Her presentation was clear and concise, and the audience responded with praise.','她的演示清晰简洁，观众以称赞回应。']},
+
+  {t:'attractive', cn:'有吸引力的', ex:['The setting was simple but attractive, reflecting honesty and warmth.','场景简单却吸引人，流露出诚恳与温暖。']},
+  {t:'limit', cn:'限制；限度', ex:['To stay focused, set a time limit and avoid unnecessary bother.','为保持专注，请设定时间限制并避免无谓打扰。']},
+  {t:'respect', cn:'尊重；方面', ex:['We respect different opinions, even when they contrast with our own.','即使与我们不同，我们也尊重他人的观点。']},
+  {t:'figure', cn:'数字；人物；身材；认为', ex:['According to the survey, the unemployment figure fell after the expansion.','调查显示，扩建后失业数字下降了。']},
+
+  {t:'pose', cn:'造成；构成；摆姿势', ex:['Heavy traffic can pose a safety concern for local residents.','车流量过大会给当地居民带来安全隐患。']},
+  {t:'major', cn:'主要的；重大的；主修', ex:['A major reduction in costs made the project affordable.','成本的大幅下降使项目负担得起。']},
+  {t:'stress', cn:'压力；强调', ex:['Short breaks during study can reduce stress and improve memory.','学习间隙的短暂休息可减压并提升记忆力。']},
+  {t:'desire', cn:'渴望；欲望', ex:['She had a strong desire to produce meaningful work.','她强烈渴望创作有意义的作品。']},
+
+  {t:'select', cn:'选择', ex:['Please select nine words per page to begin this round.','每页选择九个单词开始本回合。']},
+  {t:'memory', cn:'记忆；回忆', ex:['Spaced repetition strengthens memory despite early difficulty.','尽管初期困难，间隔复习能增强记忆。']},
+  {t:'energy', cn:'能量；精力', ex:['A short walk can restore energy and improve your mood.','短暂散步能恢复精力并改善心情。']},
+  {t:'annoy', cn:'使恼怒', ex:['Loud notifications annoy everyone during lectures—please mute your phone.','上课时大声提示音会惹恼所有人——请静音手机。']},
+
+  {t:'reflect', cn:'反映；反射；深思', ex:['Take five minutes to reflect and assess your progress.','花五分钟反思并评估你的进度。']},
+  {t:'memorial', cn:'纪念物；纪念馆', ex:['The new memorial honors local heroes and their honesty.','新的纪念碑纪念着本地英雄与他们的诚实。']},
+  {t:'reward', cn:'奖励；回报', ex:['We set small rewards to reduce hesitation and keep going.','设置小奖励能减少犹豫并促使坚持。']},
+  {t:'container', cn:'容器', ex:['Please put the devices into the labeled container after class.','下课后请把设备放入标有标签的容器中。']},
+
+  {t:'relation', cn:'关系；联系', ex:['There is a close relation between appetite and energy.','食欲与精力之间关系密切。']},
+  {t:'persuade', cn:'说服', ex:['Data can persuade the committee to approve the procedure.','数据能说服委员会批准该流程。']},
+  {t:'inspiration', cn:'灵感', ex:['Travel often brings inspiration and fresh content for writing.','旅行常会带来灵感与新鲜的写作素材。']},
+  {t:'praise', cn:'赞扬', ex:['Teachers praise students who respond clearly and honestly.','老师会赞扬回应清晰且诚恳的学生。']},
+
+  {t:'settle', cn:'解决；定居；安顿', ex:['Let\'s settle the schedule first and assign tasks.','先把日程定下来，再分配任务。']},
+  {t:'involve', cn:'涉及；包含；牵涉', ex:['The plan will involve a survey and a short presentation.','该计划将包含一次调研和一个简短演示。']},
+  {t:'regard', cn:'看待；问候（复数：regards）', ex:['With regard to safety, follow the directions at the entrance.','关于安全，请遵循入口处的指示。']},
+  {t:'appetite', cn:'食欲；渴望', ex:['Regular exercise can boost your appetite and reduce stress.','规律运动能增强食欲并减轻压力。']},
+
+  {t:'reliance', cn:'依赖；信赖', ex:['Too much reliance on one source may limit your perspective.','过度依赖单一来源会限制你的视角。']},
+  {t:'measure', cn:'测量；措施', ex:['We need to measure results before we evaluate the program.','在评估该项目前，我们需要对结果进行测量。']},
+  {t:'setting', cn:'环境；背景；设置', ex:['Change the app setting to freeze animations on low-energy devices.','在低电量设备上可更改应用设置以冻结动画。']},
+  {t:'honesty', cn:'诚实；正直', ex:['Honesty builds trust and strong connections.','诚实能建立信任与稳固的人际连接。']},
+
+  {t:'contrast', cn:'对比；差异', ex:['The contrast between salary and workload raised concern.','薪资与工作量的反差引发了担忧。']},
+  {t:'local', cn:'本地的；当地的', ex:['Local residents responded to the urgent call for donation.','当地居民对紧急募捐迅速作出响应。']},
+  {t:'suspect', cn:'怀疑；嫌疑人', ex:['I suspect the failure happened because the container wasn\'t sealed.','我怀疑故障发生的原因是容器未密封。']},
+  {t:'integrate', cn:'整合；融入', ex:['We will integrate the new feature without breaking existing content.','我们会整合新特性，同时不破坏现有内容。']},
+
+  {t:'approve', cn:'批准；赞成', ex:['The board will approve the expansion if the data make sense.','若数据合理，董事会将批准扩建。']},
+  {t:'freeze', cn:'冻结；结冰；卡死', ex:['If the app freezes, check the procedure and restart.','若应用卡死，请检查流程并重启。']},
+  {t:'independent', cn:'独立的', ex:['She became financially independent after a higher salary.','获得更高薪资后，她在经济上实现了独立。']},
+  {t:'hesitation', cn:'犹豫', ex:['After a brief hesitation, he proposed a new direction.','短暂犹豫后，他提出了新方向。']},
+
+  {t:'entrance', cn:'入口；进入', ex:['Please wait at the main entrance; the lecture starts at seven.','请在正门等待；讲座七点开始。']},
+  {t:'assign', cn:'分配；布置', ex:['Teachers assign writing that reflects local issues.','老师会布置反映本地问题的写作任务。']},
+  {t:'expansion', cn:'扩张；扩建', ex:['The library expansion includes a memorial and a new lecture hall.','图书馆扩建包含一处纪念碑和一间新讲堂。']},
+  {t:'bother', cn:'打扰；烦恼', ex:['Don\'t bother with rumors; confirm facts through a survey.','别被流言打扰；用调查来核实事实。']},
+
+  {t:'afford', cn:'买得起；负担得起', ex:['We can\'t afford delays on this urgent procedure.','这项紧急流程经不起延误。']},
+  {t:'giant', cn:'巨大的；巨头', ex:['Several tech giants were recognized as leaders in contemporary AI.','多家科技巨头被视为当代人工智能领域的领军者。']},
+  {t:'string', cn:'细绳；字符串', ex:['Use a strong string to tie the container before transport.','运输前用牢固的细绳捆好容器。']},
+  {t:'accompanied', cn:'陪同的；伴随的（accompanied by）', ex:['She arrived accompanied by a local guide who knew every entrance.','她在一位熟悉各个入口的本地向导陪同下到达。']},
+
+  {t:'quantity', cn:'数量', ex:['Limit sugar quantity to maintain energy and appetite.','限制糖的摄入量以维持精力与食欲。']},
+  {t:'salary', cn:'薪水', ex:['They negotiated a higher salary despite a reduction plan.','尽管公司有缩减计划，他们仍谈下了更高薪资。']},
+  {t:'assess', cn:'评估', ex:['We assess each student independently to ensure fairness.','我们独立评估每位学生以确保公平。']},
+  {t:'reduction', cn:'减少；缩减', ex:['The reduction in noise will prevent annoyance during study.','噪音的减少将防止学习时的烦躁。']},
+
+  {t:'separate', cn:'分开；单独的', ex:['Please separate the words into rounds and assign them.','请把单词分成若干回合并进行分配。']},
+  {t:'check', cn:'检查；核对；支票', ex:['Double-check the figures before the presentation.','演示前请再次核对数据。']},
+  {t:'identify', cn:'识别；确认', ex:['Can you identify the main concern in this procedure?','你能识别出该流程中的主要问题吗？']},
+  {t:'make sense', cn:'有道理；讲得通', ex:['Your explanation makes sense despite limited coverage.','尽管覆盖有限，你的解释仍然说得通。']},
+
+  {t:'contain', cn:'包含；容纳', ex:['Does this container contain any chemical products?','这个容器里是否包含任何化学品？']},
+  {t:'steal', cn:'偷窃', ex:['The suspect tried to steal phones near the entrance.','嫌疑人试图在入口附近偷手机。']},
+  {t:'confirm', cn:'确认', ex:['Please confirm the survey time with the local team.','请与本地团队确认调研时间。']},
+  {t:'charity', cn:'慈善；慈善机构', ex:['The charity organized a donation to support education.','该慈善机构组织了捐款以支持教育。']},
+
+  {t:'produce', cn:'生产；出产；农产品', ex:['Local farms produce fresh vegetables in large quantities.','当地农场大量出产新鲜蔬菜。']},
+  {t:'fortunate', cn:'幸运的', ex:['We are fortunate to have independent experts supporting us.','我们很幸运能得到独立专家的支持。']},
+  {t:'be recognized as', cn:'被认为是；被公认为', ex:['She was recognized as a major figure after the presentation.','那次演示后，她被公认为重要人物。']},
+  {t:'evaluate', cn:'评估；评价', ex:['Before expansion, we must evaluate costs and benefits.','扩建前我们必须评估成本与收益。']},
+
+  {t:'urgent', cn:'紧急的', ex:['This is an urgent message—please respond soon.','这是一条紧急信息——请尽快回复。']},
+  {t:'direction', cn:'方向；指示；说明', ex:['Follow the safety directions posted by the entrance.','遵循入口处张贴的安全指示。']},
+  {t:'survey', cn:'调查；测量', ex:['The survey data reflect a strong desire for longer lectures.','调查数据显示，大家强烈希望延长授课时间。']},
+  {t:'require', cn:'需要；要求', ex:['Most procedures require patience and careful checks.','大多数流程需要耐心与细致的核查。']},
+
+  {t:'procedure', cn:'程序；流程；手续', ex:['The new procedure was approved after a short trial.','新流程在短期试运行后获批。']},
+  {t:'contemporary', cn:'当代的；同一时代的', ex:['Contemporary artists often integrate technology into their work.','当代艺术家常将技术融入作品。']},
+  {t:'respond', cn:'回答；回应', ex:['Please respond to the message despite being busy.','即使忙碌也请回复此消息。']},
+  {t:'despite', cn:'尽管', ex:['Despite the stress, she kept her honesty and respect.','尽管压力很大，她仍保持诚实与尊重。']},
+
+  {t:'propose', cn:'提议；求婚', ex:['I propose we select fewer features to reduce complexity.','我建议我们少选一些功能以降低复杂度。']},
+  {t:'concern', cn:'担忧；关切；涉及', ex:['Data privacy is a major concern for contemporary users.','数据隐私是当代用户的主要担忧。']},
+  {t:'consult', cn:'咨询；请教', ex:['Consult your teacher if you suspect a mistake.','若怀疑有误，请咨询老师。']},
+  {t:'feature', cn:'特征；特色；以…为特色', ex:['This app\'s key feature is the nine-word round.','本应用的核心特色是“九词一回合”。']},
+  {t:'donation', cn:'捐赠；捐款', ex:['Their donation was small in quantity but full of affection.','他们的捐赠数量不多，却饱含爱心。']},
+  {t:'connection', cn:'连接；联系', ex:['A stable internet connection is required for online lectures.','在线授课需要稳定的网络连接。']},
+];
+
+// —————————— 构建原始顺序（包含重复） ——————————
+const deckOrder = [
+  'replace','favorable','addition','exist',
+  'position','recommend','tip','affect',
+  'lecture','content','tend','affection',
+  'favor','prevent','coverage','presentation',
+
+  'attractive','limit','respect','figure',
+  'pose','major','stress','desire',
+  'select','memory','energy','annoy',
+  'reflect','memorial','reward','container',
+
+  'relation','persuade','inspiration','limit',
+  'praise','settle','involve','reflect',
+  'regard','appetite','attractive','limit',
+  'reliance','measure','select','major',
+
+  'setting','honesty','contrast','local',
+  'suspect','integrate','approve','freeze',
+  'independent','hesitation','entrance','assign',
+  'expansion','bother','afford','giant',
+
+  'string','accompanied','quantity','salary',
+  'assess','reduction','separate','check',
+  'identify','make sense','contain','steal',
+  'confirm','charity','produce','fortunate',
+
+  'be recognized as','evaluate','urgent','direction',
+  'survey','require','procedure','contemporary',
+  'respond','despite','propose','concern',
+  'consult','feature','donation','connection',
+];
+
+// 建立索引
+const map = new Map(base.map((b,i)=>[b.t,i]));
+const deck = deckOrder.map(t=>base[map.get(t)]).filter(Boolean);
+
+// —————————— 状态 ——————————
+let currentRound = 0; // 从0起
+const pageSize = 9;
+let inSentencesView = false;
+let scrambled = false;
+let wrongBook = new Set(JSON.parse(localStorage.getItem('wrongBook_v1')||'[]'));
+
+// —————————— 工具函数 ——————————
+function speak(text, lang='en-US'){
+  try{
+    const u = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const en = voices.find(v=>/en[-_](US|GB)|English/i.test(v.lang)) || voices[0];
+    if(en) u.voice = en; u.lang = en?.lang || lang; u.rate = 0.95; u.pitch = 1; u.volume = 1;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }catch(e){console.warn('TTS failed:',e)}
+}
+function saveWrong(){ localStorage.setItem('wrongBook_v1', JSON.stringify([...wrongBook])); }
+function chunk(arr, size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
+function randPick(arr, k){ const a=[...arr]; a.sort(()=>Math.random()-0.5); return a.slice(0, k); }
+function setBar(){
+  const total = inWrongMode ? getWrongDeck().length : deck.length;
+  if(total <= 0){ document.getElementById('bar').style.width = '0%'; return; }
+  const totalRounds = Math.max(1, Math.ceil(total/pageSize));
+  const pct = ((currentRound) / (totalRounds-1 || 1)) * 100;
+  document.getElementById('bar').style.width = pct + '%';
+}
+
+// —————————— 渲染：词卡页 ——————————
+function renderWords(){
+  inSentencesView = false;
+  document.getElementById('wordsView').style.display='block';
+  document.getElementById('sentencesView').style.display='none';
+  document.getElementById('toggleViewBtn').textContent='切换到例句页';
+
+  const arr = inWrongMode ? getWrongDeck() : deck;
+  const rounds = chunk(arr, pageSize);
+  const totalRounds = rounds.length;
+  currentRound = Math.max(0, Math.min(currentRound, Math.max(0,totalRounds-1)));
+  const round = rounds[currentRound] || [];
+  const g = document.getElementById('grid');
+  g.innerHTML='';
+
+  if(inWrongMode && arr.length===0){
+    g.innerHTML = '<div class="card" style="border-style:dashed;opacity:.9"><div class="term">错题本是空的</div><div class="meta">在词卡页点击📌加入后再来复习</div></div>';
+    document.getElementById('roundIdx').textContent = 0;
+    document.getElementById('roundTotal').textContent = 0;
+    document.getElementById('roundCount').textContent = 0;
+    setBar();
+    return;
+  }
+
+  round.forEach(item=>{
+    const card = document.createElement('div');
+    card.className='card';
+
+    const tb = document.createElement('div');
+    tb.className='toolbar';
+
+    const exBtn = document.createElement('button');
+    exBtn.className='iconbtn'; exBtn.title='例句'; exBtn.innerHTML='💬';
+    exBtn.onclick = ()=>openExample(item);
+
+    const pin = document.createElement('button');
+    pin.className='iconbtn'; pin.title='加入/移出错题本'; pin.innerHTML='📌';
+    if(wrongBook.has(item.t)) pin.classList.add('active');
+    pin.onclick = ()=>{ if(wrongBook.has(item.t)) wrongBook.delete(item.t); else wrongBook.add(item.t); pin.classList.toggle('active'); saveWrong(); updateFooter(); };
+
+    tb.appendChild(exBtn); tb.appendChild(pin);
+
+    const term = document.createElement('div');
+    term.className='term'; term.textContent = item.t;
+    term.setAttribute('role','button');
+    term.onclick = ()=>{ speak(item.t); cn.classList.toggle('show'); };
+
+    const cn = document.createElement('div');
+    cn.className='cn'; cn.textContent = item.cn;
+
+    const meta = document.createElement('div');
+    meta.className='meta'; meta.textContent='点击单词：发音 + 显示中文';
+
+    card.appendChild(tb);
+    card.appendChild(term);
+    card.appendChild(cn);
+    card.appendChild(meta);
+    g.appendChild(card);
+  });
+
+  // 补位（不足9个）
+  const remain = pageSize - round.length;
+  for(let i=0;i<remain;i++){
+    const ghost = document.createElement('div');
+    ghost.className='card';
+    ghost.style.opacity=.5; ghost.style.borderStyle='dashed';
+    ghost.innerHTML='<div class="meta">（本回合不足九个）</div>';
+    g.appendChild(ghost);
+  }
+
+  document.getElementById('roundIdx').textContent = (currentRound+1);
+  document.getElementById('roundTotal').textContent = totalRounds;
+  document.getElementById('roundCount').textContent = round.length;
+  setBar();
+}
+
+// —————————— 渲染：例句页（本回合随机2~3句） ——————————
+function renderSentences(){
+  inSentencesView = true;
+  document.getElementById('wordsView').style.display='none';
+  document.getElementById('sentencesView').style.display='block';
+  document.getElementById('toggleViewBtn').textContent='切换到词卡页';
+
+  const arr = inWrongMode ? getWrongDeck() : deck;
+  const rounds = chunk(arr, pageSize);
+  const round = rounds[currentRound] || [];
+  const box = document.getElementById('sentences');
+  box.innerHTML='';
+
+  if(inWrongMode && arr.length===0){
+    const s = document.createElement('div'); s.className='sentence';
+    s.innerHTML = '<div class="en">错题本暂无例句</div><div class="zh show">先回到词库页添加一些📌吧</div>';
+    box.appendChild(s);
+    return;
+  }
+
+  const k = Math.min(3, Math.max(2, Math.floor(Math.random()*2)+2));
+  const pick = randPick(round, Math.min(k, round.length));
+
+  pick.forEach(item=>{
+    const s = document.createElement('div'); s.className='sentence';
+    const en = document.createElement('div'); en.className='en'; en.textContent=item.ex[0];
+    const zh = document.createElement('div'); zh.className='zh'; zh.textContent=item.ex[1];
+    s.appendChild(en); s.appendChild(zh);
+    s.onclick=()=> zh.classList.toggle('show');
+    box.appendChild(s);
+  });
+}
+
+// —————————— 例句弹窗 ——————————
+function openExample(item){
+  document.getElementById('exTitle').textContent = `📘 ${item.t}`;
+  const c = document.getElementById('exContent');
+  c.innerHTML = '';
+  const en = document.createElement('div'); en.className='en'; en.textContent=item.ex[0];
+  const zh = document.createElement('div'); zh.className='zh show'; zh.textContent=item.ex[1];
+  const p = document.createElement('div'); p.className='hint'; p.textContent='点击英文发音';
+  en.onclick=()=>speak(item.ex[0]);
+  c.appendChild(en); c.appendChild(zh); c.appendChild(p);
+  document.getElementById('exampleModal').classList.add('show');
+}
+
+// —————————— 迷你翻译挑战 ——————————
+let quizItem = null;
+function openQuiz(){
+  const rounds = chunk(deck, pageSize);
+  const round = inWrongMode? chunk(getWrongDeck(), pageSize)[currentRound] || [] : rounds[currentRound] || [];
+  if(round.length===0){ alert('本回合暂无词条'); return; }
+  quizItem = round[Math.floor(Math.random()*round.length)];
+  const wrap = document.getElementById('quizWrap');
+  wrap.innerHTML = '';
+  const q = document.createElement('div'); q.className='en'; q.style.marginBottom='8px'; q.textContent = `请翻译：${quizItem.t}`;
+  const input = document.createElement('input'); input.placeholder='输入中文意思'; input.style.width='100%'; input.style.padding='10px'; input.style.borderRadius='10px'; input.style.border='1px solid var(--stroke)'; input.style.background='rgba(255,255,255,.06)'; input.style.color='var(--txt)';
+  const bar = document.createElement('div'); bar.style.display='flex'; bar.style.gap='8px'; bar.style.marginTop='10px';
+  const btn = document.createElement('button'); btn.className='btn primary'; btn.textContent='提交';
+  const reveal = document.createElement('button'); reveal.className='btn'; reveal.textContent='显示答案';
+  const addWrong = document.createElement('button'); addWrong.className='btn'; addWrong.textContent='加入错题本 📌';
+  bar.appendChild(btn); bar.appendChild(reveal); bar.appendChild(addWrong);
+  const res = document.createElement('div'); res.className='hint'; res.style.marginTop='8px';
+
+  btn.onclick = ()=>{
+    const user = (input.value||'').trim();
+    if(!user){ res.textContent='先输入你的翻译~'; return; }
+    // 宽松判断：只要包含任意两个中文字符且与答案有交集就给通过；否则展示答案
+    const ans = quizItem.cn.replace(/[；;，,。]/g,' ');
+    let ok=false;
+    const parts = ans.split(/\s+/).filter(Boolean);
+    for(const p of parts){ if(p && user.includes(p)) { ok=true; break; } }
+    if(ok){ res.textContent='✅ 不错！'; confetti(); }
+    else { res.textContent='❌ 再想想。正确答案：'+quizItem.cn; }
+  };
+  reveal.onclick = ()=>{ res.textContent='答案：'+quizItem.cn; };
+  addWrong.onclick = ()=>{ wrongBook.add(quizItem.t); saveWrong(); updateFooter(); addWrong.classList.add('active'); };
+
+  wrap.appendChild(q); wrap.appendChild(input); wrap.appendChild(bar); wrap.appendChild(res);
+  document.getElementById('quizModal').classList.add('show');
+}
+
+// —————————— 错题本视图 ——————————
+let inWrongMode = false;
+function getWrongDeck(){ return [...wrongBook].map(t=> base[map.get(t)]).filter(Boolean); }
+function enterWrong(){ inWrongMode = true; document.getElementById('deckTabBtn').style.display='inline-flex'; document.getElementById('wrongTabBtn').style.display='none'; currentRound=0; renderWords(); updateFooter(); }
+function leaveWrong(){ inWrongMode = false; document.getElementById('deckTabBtn').style.display='none'; document.getElementById('wrongTabBtn').style.display='inline-flex'; currentRound=0; renderWords(); updateFooter(); }
+
+// —————————— 融合：上一/下一回合、随机顺序、显示全部/隐藏全部 ——————————
+function showAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.add('show')); }
+function hideAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.remove('show')); }
+function showAllZh(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.add('show')); }
+function hideAllZh(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.remove('show')); }
+
+function updateFooter(){
+  const total = inWrongMode ? getWrongDeck().length : deck.length;
+  let rounds = Math.ceil(total/pageSize);
+  const wrongCount = wrongBook.size; document.getElementById('wrongCount').textContent = wrongCount;
+
+  if(inWrongMode && total===0){
+    document.getElementById('roundTotal').textContent = 0;
+    document.getElementById('roundIdx').textContent = 0;
+    document.getElementById('roundCount').textContent = 0;
+    setBar();
+    return;
+  }
+
+  rounds = Math.max(1, rounds);
+  document.getElementById('roundTotal').textContent = rounds;
+  const roundArr = inWrongMode ? chunk(getWrongDeck(), pageSize)[currentRound] || [] : chunk(deck, pageSize)[currentRound] || [];
+  document.getElementById('roundCount').textContent = roundArr.length;
+  document.getElementById('roundIdx').textContent = (currentRound+1);
+  setBar();
+}
+
+function prevRound(){ if(currentRound>0){ currentRound--; renderCurrent(); } }
+function nextRound(){
+  const total = inWrongMode ? getWrongDeck().length : deck.length;
+  const rounds = Math.ceil(total/pageSize);
+  if(currentRound < rounds-1){ currentRound++; renderCurrent(); }
+}
+function renderCurrent(){ if(inSentencesView) renderSentences(); else renderWords(); updateFooter(); }
+function toggleView(){ inSentencesView? renderWords() : renderSentences(); }
+
+function shuffleDeck(){
+  scrambled = !scrambled;
+  const arr = inWrongMode ? getWrongDeck() : deck;
+  if(scrambled){ arr.sort(()=>Math.random()-0.5); } else { // 恢复原顺序
+    if(inWrongMode){ /* 错题本无原顺序，忽略 */ }
+    else {
+      // 重建 deck 为原始顺序
+      while(deck.length) deck.pop();
+      deckOrder.forEach(t=> deck.push(base[map.get(t)]));
+    }
+  }
+  currentRound=0; renderCurrent();
+}
+
+// —————————— 小惊喜（彩纸） ——————————
+function confetti(){
+  const b = document.getElementById('burst');
+  for(let i=0;i<32;i++){
+    const p=document.createElement('div'); p.className='piece';
+    const x = (window.innerWidth/2)+'px'; const y = '20%';
+    const x2 = (Math.random()*100)+'vw'; const y2 = (60+Math.random()*40)+'vh';
+    p.style.setProperty('--x', x); p.style.setProperty('--y', y); p.style.setProperty('--x2', x2); p.style.setProperty('--y2', y2);
+    p.style.background = `linear-gradient(${Math.random()*360}deg, var(--accent), var(--accent2))`;
+    p.style.left = (window.innerWidth/2)+'px'; p.style.top='10%';
+    b.appendChild(p); setTimeout(()=>p.remove(), 1000);
+  }
+}
+let titleTap=0; document.getElementById('title').addEventListener('click',()=>{ titleTap++; if(titleTap>=3){ confetti(); titleTap=0; }});
+
+// —————————— 事件绑定 ——————————
+window.addEventListener('load', ()=>{ renderWords(); updateFooter(); setTimeout(()=>speechSynthesis.getVoices(), 300); });
+
+document.getElementById('prevBtn').onclick = prevRound;
+document.getElementById('nextBtn').onclick = nextRound;
+document.getElementById('toggleViewBtn').onclick = toggleView;
+document.getElementById('showAllBtn').onclick = showAllCN;
+document.getElementById('hideAllBtn').onclick = hideAllCN;
+document.getElementById('shuffleBtn').onclick = shuffleDeck;
+document.getElementById('wrongTabBtn').onclick = enterWrong;
+document.getElementById('deckTabBtn').onclick = leaveWrong;
+document.getElementById('miniGameBtn').onclick = openQuiz;
+document.getElementById('eggBtn').onclick = confetti;
+
+document.getElementById('shuffleSentBtn').onclick = renderSentences;
+document.getElementById('showAllZhSent').onclick = showAllZh;
+document.getElementById('hideAllZhSent').onclick = hideAllZh;
+
+document.getElementById('closeEx').onclick = ()=>document.getElementById('exampleModal').classList.remove('show');
+document.getElementById('exampleModal').addEventListener('click', e=>{ if(e.target.id==='exampleModal') e.currentTarget.classList.remove('show'); });
+
+document.getElementById('closeQuiz').onclick = ()=>document.getElementById('quizModal').classList.remove('show');
+document.getElementById('quizModal').addEventListener('click', e=>{ if(e.target.id==='quizModal') e.currentTarget.classList.remove('show'); });
+</script>
+</body>
+</html>
