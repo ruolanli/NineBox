@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Day11 · 9词回合训练｜词卡 + 例句 + 错题本</title>
+<style>
+  :root{
+    /* —— 主题：调亮（冰白微蓝） —— */
+    --bg:#f7faff;             /* 背景主色更亮 */
+    --bg2:#eaf2ff;
+    --txt:#0f1a2e;            /* 主文字改深色 */
+    --muted:#5c6a86;          /* 次级文字 */
+    --card:rgba(255,255,255,.86); /* 玻璃卡更亮 */
+    --blur:10px;
+    --stroke:rgba(22,34,66,.12);
+    --accent:#4d7cff;         /* 点缀蓝 */
+    --accent2:#86b2ff;        /* 次点缀 */
+    --ok:#2fa66e;             /* 正向色 */
+    --warn:#e6a900;           /* 提示色 */
+    --danger:#e05b72;         /* 危险色 */
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 55% at 20% -10%, #e6eeff 0%, transparent 60%),
+      radial-gradient(900px 55% at 120% 30%, #f0f5ff 0%, transparent 50%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+    color:var(--txt);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Hiragino Sans GB",sans-serif;
+  }
+  .app{max-width:1000px;margin:0 auto;padding:20px 16px 28px}
+  header.head{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .title{display:flex;align-items:center;gap:10px}
+  .title h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px}
+  .badge{font-size:12px;padding:4px 8px;border:1px solid var(--stroke);border-radius:999px;background:rgba(255,255,255,.7);color:var(--muted)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{
+    appearance:none;border:1px solid var(--stroke);
+    background:linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.85));
+    color:var(--txt);padding:8px 12px;border-radius:10px;font-size:14px;cursor:pointer;
+    backdrop-filter:blur(var(--blur));transition:.2s;display:inline-flex;align-items:center;gap:8px
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px -16px rgba(15,26,46,.25)}
+  .btn[disabled]{opacity:.55;cursor:not-allowed}
+  .btn.primary{border-color:rgba(77,124,255,.35);box-shadow:inset 0 0 0 1px rgba(77,124,255,.2)}
+  .btn.ghost{background:transparent}
+
+  .tabs{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+  .tabs .tab{padding:6px 12px;border:1px solid var(--stroke);border-radius:999px;font-size:13px;color:var(--muted);cursor:pointer}
+  .tabs .tab.active{color:var(--txt);border-color:rgba(77,124,255,.35);box-shadow:inset 0 0 0 1px rgba(77,124,255,.2)}
+
+  /* 网格卡片 */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.grid{grid-template-columns:1fr}}
+  .card{
+    position:relative;padding:16px;border-radius:16px;
+    background:var(--card);
+    border:1px solid var(--stroke);
+    backdrop-filter:blur(var(--blur));min-height:120px;display:flex;flex-direction:column;gap:8px
+  }
+  .term{font-size:22px;font-weight:800;letter-spacing:.2px;margin:6px 0} /* ↑ 稍微放大 */
+  .cn{color:var(--ok);font-size:18px;display:none}                       /* ↑ 稍微放大 */
+  .cn.show{display:block}
+  .meta{font-size:12px;color:var(--muted)}
+  .toolbar{position:absolute;top:8px;right:8px;display:flex;gap:6px}
+  .iconbtn{
+    border:1px solid var(--stroke);background:rgba(255,255,255,.9);
+    width:34px;height:32px;border-radius:9px;display:grid;place-items:center;
+    color:#5a6b85;cursor:pointer
+  }
+  .iconbtn.active{color:var(--accent);box-shadow:inset 0 0 0 1px rgba(77,124,255,.35)}
+  .iconbtn:hover{transform:translateY(-1px)}
+
+  /* 例句区域 */
+  .sentences{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  .sentence{
+    padding:16px 16px;border-radius:14px;background:var(--card);
+    border:1px solid var(--stroke);backdrop-filter:blur(var(--blur));
+  }
+  .en{font-weight:700}
+  .zh{display:none;color:var(--ok)}
+  .zh.show{display:block;margin-top:6px}
+
+  footer.foot{margin-top:16px;display:flex;gap:10px;align-items:center;justify-content:space-between;color:var(--muted)}
+  .meter{height:8px;background:rgba(15,26,46,.07);border-radius:999px;overflow:hidden;flex:1}
+  .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
+
+  /* 模态层 */
+  .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(10,12,20,.25);backdrop-filter:blur(6px);z-index:40}
+  .modal.show{display:grid}
+  .dialog{
+    width:min(720px,92vw);
+    background:linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.92));
+    border:1px solid var(--stroke);border-radius:16px;padding:18px;color:var(--txt)
+  }
+
+  /* 迷你彩纸 */
+  .burst{position:fixed;pointer-events:none;inset:0;overflow:hidden;z-index:60}
+  .piece{position:absolute;width:8px;height:12px;opacity:0;animation:pop 1s ease-out forwards}
+  @keyframes pop{0%{transform:translate(var(--x),var(--y)) rotate(0) scale(.8);opacity:1}
+                 100%{transform:translate(var(--x2),var(--y2)) rotate(720deg) scale(1);opacity:0}}
+
+  .hint{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="head">
+      <div class="title" id="title">
+        <span class="badge">Day11</span>
+        <h1>9词回合训练 · 词卡 ↔ 例句 · 错题本</h1>
+      </div>
+      <div class="controls">
+        <button class="btn" id="prevBtn">← 上一回合</button>
+        <button class="btn primary" id="toggleViewBtn">切换到例句页</button>
+        <button class="btn" id="nextBtn">下一回合 →</button>
+        <button class="btn ghost" id="showAllBtn">显示全部译文</button>
+        <button class="btn ghost" id="hideAllBtn">隐藏全部译文</button>
+        <button class="btn" id="shuffleBtn">随机顺序</button>
+        <button class="btn" id="wrongTabBtn">错题本</button>
+        <button class="btn" id="deckTabBtn" style="display:none">返回词库</button>
+        <button class="btn" id="miniGameBtn">🎮 翻译挑战</button>
+        <button class="btn ghost" id="eggBtn" title="小惊喜">🎁</button>
+      </div>
+      <div class="hint">提示：点击单词即可<span style="color:var(--ok)">发音 + 显示翻译</span>；📌图钉加入错题本；💬查看例句。</div>
+    </header>
+
+    <section id="wordsView">
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section id="sentencesView" style="display:none">
+      <div class="controls" style="margin-top:4px">
+        <button class="btn" id="shuffleSentBtn">换一组例句</button>
+        <button class="btn ghost" id="showAllZhSent">显示全部译文</button>
+        <button class="btn ghost" id="hideAllZhSent">隐藏全部译文</button>
+      </div>
+      <div class="sentences" id="sentences"></div>
+    </section>
+
+    <footer class="foot">
+      <div id="status">回合 <span id="roundIdx">1</span>/<span id="roundTotal">1</span> · 本回合词数 <span id="roundCount">0</span> · 错题本 <span id="wrongCount">0</span></div>
+      <div class="meter"><div class="bar" id="bar"></div></div>
+    </footer>
+  </div>
+
+  <!-- 例句弹窗 -->
+  <div class="modal" id="exampleModal" aria-hidden="true">
+    <div class="dialog">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <h3 id="exTitle" style="margin:0">例句</h3>
+        <button class="btn" id="closeEx">关闭</button>
+      </div>
+      <div style="margin-top:10px" id="exContent"></div>
+    </div>
+  </div>
+
+  <!-- 迷你挑战弹窗（通用，用于正常挑战 + 偶遇测验） -->
+  <div class="modal" id="quizModal" aria-hidden="true">
+    <div class="dialog">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <h3 id="quizTitle" style="margin:0">🎯 翻译挑战（输入中文义）</h3>
+        <button class="btn" id="closeQuiz">关闭</button>
+      </div>
+      <div id="quizWrap" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="burst" id="burst"></div>
+
+<script>
+/* ───────────────────────── 数据：新词库（唯一词条） ───────────────────────── */
+/* 只写词和中文义；例句由生成器动态拼出，并且每句自动夹带 3 个同表词汇 */
+const base = [
+  {t:'consequence', cn:'后果；结果', ex:[
+    'Your choice has a consequence: despite the risks, you propose an expansion that may not make sense.',
+    '你的选择会带来后果：尽管有风险，你仍提议扩张，而这未必讲得通。'
+  ]},
+  {t:'instead', cn:'代替；反而', ex:[
+    'Instead of a long presentation, we select a brief drill to assess the team’s response.',
+    '我们不做冗长汇报，改为选择一次简短演练来评估团队的反应。'
+  ]},
+  {t:'besides', cn:'此外；除…之外', ex:[
+    'Besides the ceremony, the plan includes a memorial visit and an appointment to consult a native guide.',
+    '除仪式外，计划还包含参观纪念碑以及预约咨询本地向导。'
+  ]},
+  {t:'moreover', cn:'而且；此外', ex:[
+    'Moreover, the assistant will confirm your position and assign a female speaker for the presentation.',
+    '而且，助理会确认你的座位，并为汇报指派一位女讲者。'
+  ]},
+  {t:'choice', cn:'选择', ex:[
+    'Her choice to retire was responsible and made sense despite the desire for expansion.',
+    '尽管仍渴望扩张，她选择退休是负责任且合乎情理的。'
+  ]},
+  {t:'response', cn:'回应；反应', ex:[
+    'The response was amazing; the board approve the expansion and propose to integrate a wider range.',
+    '反馈很亮眼；董事会批准了扩张，并提议整合更广的范围。'
+  ]},
+  {t:'previous', cn:'先前的', ex:[
+    'The previous assess report did not observe the contrast in appetite across the age range.',
+    '先前的评估报告未观察到不同年龄段在“偏好”上的差异。'
+  ]},
+  {t:'wheel', cn:'轮子；车轮', ex:[
+    'Without a front wheel, the hunt truck lost balance at the edge of the muddy setting.',
+    '没有前轮，狩猎用卡车在泥泞环境的边缘失去平衡。'
+  ]},
+  {t:'harvest', cn:'收获；收割', ex:[
+    'The harvest festival ceremony will involve a native dance and a presentation by the assistant.',
+    '丰收节的仪式会包含本地舞蹈，以及助理带来的展示。'
+  ]},
+  {t:'ceremony', cn:'仪式', ex:[
+    'At the ceremony, we observe a silence by the memorial and confirm the schedule.',
+    '在仪式上，我们在纪念碑前默哀，并确认后续日程。'
+  ]},
+  {t:'drill', cn:'训练；演练；钻', ex:[
+    'The safety drill will require students to concentrate, select exits, and follow the assistant’s position signs.',
+    '安全演练要求学生专注、选择出口，并跟随助理的指示牌。'
+  ]},
+  {t:'hunt', cn:'狩猎；搜寻', ex:[
+    'They hunt for evidence beyond the previous figure to evaluate the contrast in results.',
+    '他们寻找超出先前数据的证据，以评估结果的差异。'
+  ]},
+  {t:'observe', cn:'观察；遵守', ex:[
+    'We observe that independent learners tend to consult early and settle problems instead of delaying.',
+    '我们观察到独立型学习者更倾向于尽早请教并解决问题，而非拖延。'
+  ]},
+  {t:'essential', cn:'必要的；本质的', ex:[
+    'Regular measure of progress is essential to approve budgets and prevent risky expansion.',
+    '定期量化进度是必要的，这有助于批准预算并避免高风险扩张。'
+  ]},
+  {t:'assistant', cn:'助手；助理', ex:[
+    'The assistant will assign seats, confirm appointments, and integrate late arrivals into the ceremony.',
+    '助理会分配座位、确认预约，并把迟到者融入到仪式流程中。'
+  ]},
+  {t:'female', cn:'女性的；雌性', ex:[
+    'The female engineer evaluate options and propose a balanced range of solutions.',
+    '这位女工程师评估了多种方案，并提出了兼顾平衡的解法范围。'
+  ]},
+  {t:'native', cn:'本地的；母语的', ex:[
+    'A native speaker will consult students, assess pronunciation, and select particular drills.',
+    '一位母语者将为学生提供咨询、评估发音，并选择针对性的练习。'
+  ]},
+  {t:'instance', cn:'实例；例子', ex:[
+    'For instance, a presentation may involve contrast and require the speaker to observe time limits.',
+    '例如，一场报告可能涉及对比，并要求讲者遵守时间限制。'
+  ]},
+  {t:'attach', cn:'附上；附着；系上', ex:[
+    'Please attach your assess form and confirm the appointment before the presentation.',
+    '请在汇报前附上评估表并确认预约时间。'
+  ]},
+  {t:'struggle', cn:'挣扎；斗争', ex:[
+    'They struggle to make sense of the figure, so they consult the assistant and settle on a new measure.',
+    '他们难以理解这组数据，于是请教助理，并最终确定了新的度量方式。'
+  ]},
+  {t:'responsible', cn:'负责的；有责任的', ex:[
+    'A responsible manager will evaluate risk, prevent scope creep, and assign clear positions.',
+    '负责任的经理会评估风险、避免范围膨胀，并清晰分配职责。'
+  ]},
+
+  {t:'content', cn:'内容；（adj.）满意的', ex:[
+    'The content contrasts previous claims and will require expansion to integrate the new data.',
+    '这些内容与先前结论形成对比，需要扩展以整合新数据。'
+  ]},
+  {t:'tend', cn:'倾向于；照料', ex:[
+    'Teams tend to approve small changes, but when leaders propose expansion beyond the normal range, they hesitate.',
+    '团队倾向于批准小改动，但当领导提议超出常规范围的扩张时，他们会犹豫。'
+  ]},
+  {t:'prevent', cn:'防止；阻止', ex:[
+    'Clear directions and early consult can prevent confusion and make sense to everyone involved.',
+    '清晰指示与尽早请教能防止混乱，并让所有参与者觉得合理。'
+  ]},
+  {t:'presentation', cn:'演示；报告', ex:[
+    'Her presentation contrasts two settings, evaluate risks, and propose a responsible position.',
+    '她的报告对比了两种情境，评估了风险，并提出了负责的立场。'
+  ]},
+  {t:'affection', cn:'喜爱；感情', ex:[
+    'Out of affection and respect, they built a memorial and observed a quiet ceremony.',
+    '出于感情与尊重，他们建起了纪念碑，并举行了安静的仪式。'
+  ]},
+  {t:'respect', cn:'尊重；方面', ex:[
+    'We respect the assistant’s position and will confirm appointments instead of cutting the line.',
+    '我们尊重助理的安排，会确认预约而不是插队。'
+  ]},
+  {t:'figure', cn:'数字；人物；身材；认为', ex:[
+    'The latest figure suggests expansion; moreover, assess teams approve the plan after a drill.',
+    '最新数据指向扩张；而且，评审小组在演练后批准了方案。'
+  ]},
+  {t:'pose', cn:'造成；摆姿势', ex:[
+    'The policy may pose a risk to balance and require leaders to evaluate and consult.',
+    '该政策可能对平衡造成风险，需要领导层评估并请教专家。'
+  ]},
+  {t:'desire', cn:'渴望；欲望', ex:[
+    'Her desire to be independent led her to select a particular course range beyond the normal track.',
+    '她渴望独立，因此选择了超出常规路径的特定课程范围。'
+  ]},
+
+  {t:'persuade', cn:'说服', ex:[
+    'We tried to persuade the board to approve expansion by presenting clear measures and contrast.',
+    '我们通过展示清晰的措施与对比来设法说服董事会批准扩张。'
+  ]},
+  {t:'memorial', cn:'纪念碑；纪念馆', ex:[
+    'The city built a memorial to native heroes and held a ceremony that involved students.',
+    '城市为本地英雄建起纪念碑，并举行了包含学生参与的仪式。'
+  ]},
+  {t:'settle', cn:'解决；安顿', ex:[
+    'They settle the dispute by consulting experts, evaluating options, and confirming the final position.',
+    '他们通过咨询专家、评估选项并确认最终立场来解决争端。'
+  ]},
+  {t:'involve', cn:'涉及；牵涉', ex:[
+    'The project will involve an assistant team to integrate tools and assign responsible roles.',
+    '该项目将涉及一支助理团队，用于整合工具并分配责任角色。'
+  ]},
+  {t:'appetite', cn:'食欲；渴望', ex:[
+    'Appetite for risk is beyond normal this quarter; the board will assess and balance expansion.',
+    '本季度的风险偏好高于常态；董事会将评估并平衡扩张。'
+  ]},
+  {t:'measure', cn:'测量；措施', ex:[
+    'We measure outcomes, contrast them with previous data, and make sense of the consequence.',
+    '我们度量结果，与先前数据做对比，并理解其后果。'
+  ]},
+  {t:'setting', cn:'环境；设置', ex:[
+    'In a clinical setting, researchers observe responses, evaluate range, and prevent bias.',
+    '在临床环境中，研究者会观察反应、评估范围并防止偏差。'
+  ]},
+  {t:'select', cn:'选择', ex:[
+    'Please select a female speaker for the ceremony and confirm the appointment with the assistant.',
+    '请为仪式选择一位女讲者，并与助理确认预约。'
+  ]},
+  {t:'contrast', cn:'对比；差异', ex:[
+    'The contrast between content and response helps evaluate whether the plan makes sense.',
+    '内容与反馈之间的对比有助于评估方案是否合理。'
+  ]},
+
+  {t:'integrate', cn:'整合；融入', ex:[
+    'We integrate the new wheel sensor to assess balance and improve beyond the previous range.',
+    '我们整合了新的车轮传感器，以评估平衡并超越先前范围。'
+  ]},
+  {t:'approve', cn:'批准；赞成', ex:[
+    'The committee will approve expansion if you attach the measure plan and confirm the budget.',
+    '若你附上措施方案并确认预算，委员会将批准扩张。'
+  ]},
+  {t:'expansion', cn:'扩展；扩建', ex:[
+    'Rapid expansion can pose risks; therefore, we require independent assess and consult before approval.',
+    '快速扩张会带来风险；因此在批准前我们需要独立评估与咨询。'
+  ]},
+  {t:'independent', cn:'独立的', ex:[
+    'An independent assistant can evaluate options, select a choice, and settle conflicts.',
+    '独立的助理能评估选项、作出选择并解决冲突。'
+  ]},
+  {t:'assign', cn:'分配；布置', ex:[
+    'We assign roles, integrate tools, and observe whether the workflow makes sense in this setting.',
+    '我们分配角色、整合工具，并观察该流程在此情境下是否合理。'
+  ]},
+  {t:'make sense', cn:'有道理；讲得通', ex:[
+    'It makes sense to consult native experts and evaluate contrast before you propose changes.',
+    '在你提出改动前，向本地专家请教并评估差异是有道理的。'
+  ]},
+  {t:'confirm', cn:'确认', ex:[
+    'Please confirm your appointment, attach the presentation file, and select a position near the edge.',
+    '请确认预约、附上汇报文件，并选择靠近边缘的位置。'
+  ]},
+  {t:'fortunate', cn:'幸运的', ex:[
+    'We were fortunate to harvest early data; moreover, the response was amazing across a wide range.',
+    '我们很幸运地早早收获数据；而且，反馈在广泛范围内都很出色。'
+  ]},
+  {t:'evaluate', cn:'评估；评价', ex:[
+    'We evaluate the consequence of each choice and, if necessary, propose a safer alternative.',
+    '我们评估每个选择的后果，必要时提出更安全的替代方案。'
+  ]},
+
+  {t:'require', cn:'需要；要求', ex:[
+    'Some drills require you to concentrate; besides, the setting may involve edge cases that make sense later.',
+    '有些演练需要你专注；此外，该情境可能包含稍后才看得懂的边缘情况。'
+  ]},
+  {t:'despite', cn:'尽管', ex:[
+    'Despite the struggle, the team integrate systems and approve a balanced position.',
+    '尽管艰难，团队还是整合了系统，并批准了较为平衡的立场。'
+  ]},
+  {t:'propose', cn:'提议；求婚', ex:[
+    'They propose an appointment schedule to prevent overlap and respect everyone’s range of needs.',
+    '他们提议了一份预约时间表，以防冲突并尊重每个人的需求范围。'
+  ]},
+  {t:'consult', cn:'咨询；请教', ex:[
+    'Consult the previous assess report and confirm whether expansion is still responsible.',
+    '请查阅先前的评估报告，并确认扩张是否仍属负责之举。'
+  ]},
+  {t:'position', cn:'位置；职位；立场', ex:[
+    'Her position went beyond normal; to persuade the board, she propose we attach strict measure before they approve.',
+    '她的立场超出了常规；为说服董事会，她提议在批准前附加严格的措施。'
+  ]},
+
+  {t:'amazing', cn:'令人惊叹的', ex:[
+    'The museum’s collection is amazing; moreover, native guides select particular pieces to make sense of the era.',
+    '博物馆的藏品令人惊叹；而且，本地讲解员选择了特定展品来讲清那个时代。'
+  ]},
+  {t:'collection', cn:'收藏；合集', ex:[
+    'Our collection will expand beyond the edge of the current range if the committee approve.',
+    '若委员会同意，我们的藏品将扩展到现有范围的外缘。'
+  ]},
+  {t:'balance', cn:'平衡；权衡', ex:[
+    'To balance appetite and risk, leaders evaluate data and consult independent experts.',
+    '为权衡偏好与风险，管理层评估数据并咨询独立专家。'
+  ]},
+  {t:'range', cn:'范围；幅度', ex:[
+    'The product range will integrate new features and require careful presentation to persuade users.',
+    '该产品线将整合新特性，并需要谨慎展示来打动用户。'
+  ]},
+  {t:'retire', cn:'退休；退出', ex:[
+    'He plans to retire; instead, the assistant will assume the position and assign tasks.',
+    '他打算退休；由助理接任岗位并分配任务。'
+  ]},
+  {t:'normal', cn:'正常的', ex:[
+    'Under normal conditions we observe, a brief drill can prevent panic and make sense to students.',
+    '在我们观察到的常规条件下，简短演练就能防止恐慌且对学生是合理的。'
+  ]},
+  {t:'beyond', cn:'超出；在…之外', ex:[
+    'Beyond the ceremony, the schedule includes a memorial visit and a presentation to approve funding.',
+    '除了仪式，日程还包括参观纪念碑以及一场为争取经费批准的汇报。'
+  ]},
+  {t:'edge', cn:'边缘；优势', ex:[
+    'Living at the edge of town, she struggle to keep appointments and consult native teachers.',
+    '住在城边，她很难按时赴约并向本地老师请教。'
+  ]},
+  {t:'appointment', cn:'预约；任命', ex:[
+    'Your appointment will require a presentation; please attach slides and confirm the time.',
+    '你的预约需要进行汇报；请附上幻灯并确认时间。'
+  ]},
+  {t:'assess', cn:'评估', ex:[
+    'We assess the contrast between response and content to evaluate whether the proposal makes sense.',
+    '我们评估“反馈”和“内容”的差异，以判断提案是否合理。'
+  ]},
+  {t:'concentrate', cn:'专注；集中', ex:[
+    'Concentrate during the drill; besides, observe exits and confirm your position with the assistant.',
+    '演练时请专注；此外，请观察出口并向助理确认你的位置。'
+  ]},
+  {t:'particular', cn:'特定的；特别的', ex:[
+    'In this particular setting, we assign roles, measure progress, and prevent scope creep.',
+    '在这个特定情境下，我们分配角色、度量进度，并防止范围膨胀。'
+  ]},
+];
+
+
+/* 构建 deckOrder（9词一回合），按上面顺序即可 */
+const deckOrder = base.map(b=>b.t);
+
+
+
+/* ───────────────────────── 索引&状态 ───────────────────────── */
+const map = new Map(base.map((b,i)=>[b.t,i]));
+const deck = deckOrder.map(t=>base[map.get(t)]).filter(Boolean);
+let currentRound = 0; // 从0起
+const pageSize = 9;
+let inSentencesView = false;
+let scrambled = false;
+let wrongBook = new Set(JSON.parse(localStorage.getItem('wrongBook_v1')||'[]'));
+
+/* ───────────────────────── 工具 ───────────────────────── */
+function speak(text, lang='en-US'){
+  try{
+    const u = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    const en = voices.find(v=>/en[-_](US|GB)|English/i.test(v.lang)) || voices[0];
+    if(en) u.voice = en; u.lang = en?.lang || lang; u.rate = 0.95; u.pitch = 1; u.volume = 1;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }catch(e){console.warn('TTS failed:',e)}
+}
+function saveWrong(){ localStorage.setItem('wrongBook_v1', JSON.stringify([...wrongBook])); }
+function chunk(arr, size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
+function randPick(arr, k){ const a=[...arr]; a.sort(()=>Math.random()-0.5); return a.slice(0, k); }
+function setBar(){
+  const total = inWrongMode ? getWrongDeck().length : deck.length;
+  if(total <= 0){ document.getElementById('bar').style.width = '0%'; return; }
+  const totalRounds = Math.max(1, Math.ceil(total/pageSize));
+  const pct = ((currentRound) / (totalRounds-1 || 1)) * 100;
+  document.getElementById('bar').style.width = pct + '%';
+}
+
+/* ───────────────────────── 渲染：词卡页 ───────────────────────── */
+function renderWords(){
+  inSentencesView = false;
+  document.getElementById('wordsView').style.display='block';
+  document.getElementById('sentencesView').style.display='none';
+  document.getElementById('toggleViewBtn').textContent='切换到例句页';
+
+  const arr = inWrongMode ? getWrongDeck() : deck;
+  const rounds = chunk(arr, pageSize);
+  const totalRounds = rounds.length;
+  currentRound = Math.max(0, Math.min(currentRound, Math.max(0,totalRounds-1)));
+  const round = rounds[currentRound] || [];
+  const g = document.getElementById('grid');
+  g.innerHTML='';
+
+  if(inWrongMode && arr.length===0){
+    g.innerHTML = '<div class="card" style="border-style:dashed;opacity:.9"><div class="term">错题本是空的</div><div class="meta">在词卡页点击📌加入后再来复习</div></div>';
+    document.getElementById('roundIdx').textContent = 0;
+    document.getElementById('roundTotal').textContent = 0;
+    document.getElementById('roundCount').textContent = 0;
+    setBar();
+    return;
+  }
+
+  round.forEach(item=>{
+    const card = document.createElement('div');
+    card.className='card';
+
+    const tb = document.createElement('div');
+    tb.className='toolbar';
+
+    const exBtn = document.createElement('button');
+    exBtn.className='iconbtn'; exBtn.title='例句'; exBtn.innerHTML='💬';
+    exBtn.onclick = ()=>openExample(item);
+
+    const pin = document.createElement('button');
+    pin.className='iconbtn'; pin.title='加入/移出错题本'; pin.innerHTML='📌';
+    if(wrongBook.has(item.t)) pin.classList.add('active');
+    pin.onclick = ()=>{ if(wrongBook.has(item.t)) wrongBook.delete(item.t); else wrongBook.add(item.t); pin.classList.toggle('active'); saveWrong(); updateFooter(); };
+
+    tb.appendChild(exBtn); tb.appendChild(pin);
+
+    const term = document.createElement('div');
+    term.className='term'; term.textContent = item.t;
+    term.setAttribute('role','button');
+    term.onclick = ()=>{ speak(item.t); cn.classList.toggle('show'); maybeSurprise(); };
+
+    const cn = document.createElement('div');
+    cn.className='cn'; cn.textContent = item.cn;
+
+    const meta = document.createElement('div');
+    meta.className='meta'; meta.textContent='点击单词：发音 + 显示中文';
+
+    card.appendChild(tb);
+    card.appendChild(term);
+    card.appendChild(cn);
+    card.appendChild(meta);
+    g.appendChild(card);
+  });
+
+  // 补位（不足9个）
+  const remain = pageSize - round.length;
+  for(let i=0;i<remain;i++){
+    const ghost = document.createElement('div');
+    ghost.className='card';
+    ghost.style.opacity=.5; ghost.style.borderStyle='dashed';
+    ghost.innerHTML='<div class="meta">（本回合不足九个）</div>';
+    g.appendChild(ghost);
+  }
+
+  document.getElementById('roundIdx').textContent = (currentRound+1);
+  document.getElementById('roundTotal').textContent = totalRounds;
+  document.getElementById('roundCount').textContent = round.length;
+  setBar();
+}
+
+/* ───────────────────────── 渲染：例句页（本回合随机2~3句） ───────────────────────── */
+function renderSentences(){
+  inSentencesView = true;
+  document.getElementById('wordsView').style.display='none';
+  document.getElementById('sentencesView').style.display='block';
+  document.getElementById('toggleViewBtn').textContent='切换到词卡页';
+
+  const arr = inWrongMode ? getWrongDeck() : deck;
+  const rounds = chunk(arr, pageSize);
+  const round = rounds[currentRound] || [];
+  const box = document.getElementById('sentences');
+  box.innerHTML='';
+
+  if(inWrongMode && arr.length===0){
+    const s = document.createElement('div'); s.className='sentence';
+    s.innerHTML = '<div class="en">错题本暂无例句</div><div class="zh show">先回到词库页添加一些📌吧</div>';
+    box.appendChild(s);
+    return;
+  }
+
+  const k = Math.min(3, Math.max(2, Math.floor(Math.random()*2)+2));
+  const pick = randPick(round, Math.min(k, round.length));
+
+  pick.forEach(item=>{
+
+
+
+    const s = document.createElement('div'); s.className='sentence';
+    const en = document.createElement('div'); en.className='en'; en.textContent=item.ex[0];
+    const zh = document.createElement('div'); zh.className='zh'; zh.textContent=item.ex[1];
+    s.appendChild(en); s.appendChild(zh);
+    s.onclick=()=> zh.classList.toggle('show');
+    box.appendChild(s);
+  });
+}
+
+/* ───────────────────────── 例句弹窗 ───────────────────────── */
+function openExample(item){
+
+
+  document.getElementById('exTitle').textContent = `📘 ${item.t}`;
+  const c = document.getElementById('exContent');
+  c.innerHTML = '';
+  const en = document.createElement('div'); en.className='en'; en.textContent=item.ex[0];
+  const zh = document.createElement('div'); zh.className='zh show'; zh.textContent=item.ex[1];
+  const p = document.createElement('div'); p.className='hint'; p.textContent='点击英文发音';
+  en.onclick=()=>speak(item.ex[0]);
+  c.appendChild(en); c.appendChild(zh); c.appendChild(p);
+  document.getElementById('exampleModal').classList.add('show');
+}
+
+/* ───────────────────────── 迷你翻译挑战 ───────────────────────── */
+let quizItem = null;
+function openQuiz(fromWrong=false, promptText='🎯 翻译挑战（输入中文义）'){
+  const rounds = chunk(deck, pageSize);
+  const round = inWrongMode? chunk(getWrongDeck(), pageSize)[currentRound] || [] : rounds[currentRound] || [];
+  const pool = fromWrong ? getWrongDeck() : (round.length? round : deck);
+  if(pool.length===0){ alert('本回合暂无词条'); return; }
+  quizItem = pool[Math.floor(Math.random()*pool.length)];
+  document.getElementById('quizTitle').textContent = promptText;
+
+  const wrap = document.getElementById('quizWrap');
+  wrap.innerHTML = '';
+
+  const q = document.createElement('div'); q.className='en'; q.style.marginBottom='8px'; q.textContent = `请翻译：${quizItem.t}`;
+  const input = document.createElement('input'); input.placeholder='输入中文意思'; input.style.width='100%'; input.style.padding='10px'; input.style.borderRadius='10px'; input.style.border='1px solid var(--stroke)'; input.style.background='rgba(255,255,255,.9)'; input.style.color='var(--txt)';
+  const bar = document.createElement('div'); bar.style.display='flex'; bar.style.gap='8px'; bar.style.marginTop='10px';
+  const btn = document.createElement('button'); btn.className='btn primary'; btn.textContent='提交';
+  const reveal = document.createElement('button'); reveal.className='btn'; reveal.textContent='显示答案';
+  const addWrong = document.createElement('button'); addWrong.className='btn'; addWrong.textContent='加入错题本 📌';
+  bar.appendChild(btn); bar.appendChild(reveal); bar.appendChild(addWrong);
+  const res = document.createElement('div'); res.className='hint'; res.style.marginTop='8px';
+
+  btn.onclick = ()=>{
+    const user = (input.value||'').trim();
+    if(!user){ res.textContent='先输入你的翻译~'; return; }
+    const ans = quizItem.cn.replace(/[；;，,。]/g,' ');
+    let ok=false;
+    const parts = ans.split(/\s+/).filter(Boolean);
+    for(const p of parts){ if(p && user.includes(p)) { ok=true; break; } }
+    if(ok){ res.textContent='✅ 不错！'; confetti(); }
+    else { res.textContent='❌ 再想想。正确答案：'+quizItem.cn; }
+  };
+  reveal.onclick = ()=>{ res.textContent='答案：'+quizItem.cn; };
+  addWrong.onclick = ()=>{ wrongBook.add(quizItem.t); saveWrong(); updateFooter(); addWrong.classList.add('active'); };
+
+  wrap.appendChild(q); wrap.appendChild(input); wrap.appendChild(bar); wrap.appendChild(res);
+  document.getElementById('quizModal').classList.add('show');
+}
+
+/* ───────────────────────── 错题本视图 ───────────────────────── */
+let inWrongMode = false;
+function getWrongDeck(){ return [...wrongBook].map(t=> base[map.get(t)]).filter(Boolean); }
+function enterWrong(){ inWrongMode = true; document.getElementById('deckTabBtn').style.display='inline-flex'; document.getElementById('wrongTabBtn').style.display='none'; currentRound=0; renderWords(); updateFooter(); }
+function leaveWrong(){ inWrongMode = false; document.getElementById('deckTabBtn').style.display='none'; document.getElementById('wrongTabBtn').style.display='inline-flex'; currentRound=0; renderWords(); updateFooter(); }
+
+/* ───────────────────────── 显示/隐藏 & 随机 ───────────────────────── */
+function showAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.add('show')); }
+function hideAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.remove('show')); }
+function showAllZh(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.add('show')); }
+function hideAllZh(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.remove('show')); }
+
+function updateFooter(){
+  const total = inWrongMode ? getWrongDeck().length : deck.length;
+  let rounds = Math.ceil(total/pageSize);
+  const wrongCount = wrongBook.size; document.getElementById('wrongCount').textContent = wrongCount;
+
+  if(inWrongMode && total===0){
+    document.getElementById('roundTotal').textContent = 0;
+    document.getElementById('roundIdx').textContent = 0;
+    document.getElementById('roundCount').textContent = 0;
+    setBar();
+    return;
+  }
+
+  rounds = Math.max(1, rounds);
+  document.getElementById('roundTotal').textContent = rounds;
+  const roundArr = inWrongMode ? chunk(getWrongDeck(), pageSize)[currentRound] || [] : chunk(deck, pageSize)[currentRound] || [];
+  document.getElementById('roundCount').textContent = roundArr.length;
+  document.getElementById('roundIdx').textContent = (currentRound+1);
+  setBar();
+}
+
+function prevRound(){ if(currentRound>0){ currentRound--; renderCurrent(); } }
+function nextRound(){
+  const total = inWrongMode ? getWrongDeck().length : deck.length;
+  const rounds = Math.ceil(total/pageSize);
+  if(currentRound < rounds-1){ currentRound++; renderCurrent(); }
+}
+function renderCurrent(){ if(inSentencesView) renderSentences(); else renderWords(); updateFooter(); maybeSurprise(); }
+function toggleView(){ inSentencesView? renderWords() : renderSentences(); maybeSurprise(); }
+
+function shuffleDeck(){
+  scrambled = !scrambled;
+  const arr = inWrongMode ? getWrongDeck() : deck;
+  if(scrambled){ arr.sort(()=>Math.random()-0.5); } else {
+    if(inWrongMode){ /* 错题本无原顺序，忽略 */ }
+    else {
+      while(deck.length) deck.pop();
+      deckOrder.forEach(t=> deck.push(base[map.get(t)]));
+    }
+  }
+  currentRound=0; renderCurrent();
+}
+
+/* ───────────────────────── 小惊喜（彩纸） ───────────────────────── */
+function confetti(){
+  const b = document.getElementById('burst');
+  for(let i=0;i<32;i++){
+    const p=document.createElement('div'); p.className='piece';
+    const x = (window.innerWidth/2)+'px'; const y = '20%';
+    const x2 = (Math.random()*100)+'vw'; const y2 = (60+Math.random()*40)+'vh';
+    p.style.setProperty('--x', x); p.style.setProperty('--y', y); p.style.setProperty('--x2', x2); p.style.setProperty('--y2', y2);
+    p.style.background = `linear-gradient(${Math.random()*360}deg, var(--accent), var(--accent2))`;
+    p.style.left = (window.innerWidth/2)+'px'; p.style.top='10%';
+    b.appendChild(p); setTimeout(()=>p.remove(), 1000);
+  }
+}
+let titleTap=0; document.getElementById('title').addEventListener('click',()=>{ titleTap++; if(titleTap>=3){ confetti(); titleTap=0; }});
+
+/* ───────────────────────── 偶遇测验（随机弹出错题提醒） ─────────────────────────
+   触发时机：切换回合/视图、点击词条时，有一定概率从【错题本】抽一道；
+   表现：用共用的 quizModal，标题改为“你还没背过我~”
+*/
+let surpriseCooldown = false;
+function maybeSurprise(){
+  // 如果还在冷却或错题本为空就不触发
+  if(surpriseCooldown) return;
+  if(wrongBook.size === 0) return;
+
+  const p = inSentencesView ? 0.12 : 0.18; // 触发概率：例句页低一点，词卡页高一点
+  if(Math.random() < p){
+    surpriseCooldown = true;
+
+    // 一半概率直接出“猜中文义”的 quiz（从错题本抽）
+    if(Math.random() < 0.5){
+      openQuiz(true, '🫣 你还没背过我——再猜猜我的意思吧');
+    } else {
+      // 另一半概率在例句弹窗展示【错题本里的条目】，但**不再生成例句**，直接使用 item.ex
+      const pool = getWrongDeck();
+      const item = pool[(Math.random() * pool.length) | 0];
+
+      // 如果选中的条目不存在或者没有 ex 字段，降级为 quiz（避免报错）
+      if(!item || !item.ex || !item.ex[0]){
+        // 优先使用该条目的 quiz（若 item 存在），否则随机 quiz
+        if(item) openQuiz(true, '🫣 你还没背过我——再猜猜我的意思吧');
+        else openQuiz(false, '🫣 你还没背过我——再猜猜我的意思吧');
+      } else {
+        // 直接用 item.ex（不生成、不覆盖）
+        document.getElementById('exTitle').textContent = `🫣 你还没背过我：${item.t}`;
+        const c = document.getElementById('exContent');
+        c.innerHTML = '';
+
+        const tip = document.createElement('div'); tip.className = 'hint';
+        tip.textContent = '点英文可发音，点译文可显示/隐藏';
+
+        const en = document.createElement('div'); en.className = 'en';
+        en.textContent = item.ex[0];
+        en.onclick = () => speak(item.ex[0]);
+
+        // 中文默认隐藏，点开才显示（鼓励先猜）
+        const zh = document.createElement('div'); zh.className = 'zh';
+        zh.textContent = (item.ex[1] && item.ex[1].length) ? item.ex[1] : '（译文暂缺，先自己猜猜）';
+        // 不自动展开，用户点英文或点译文时可以查看
+
+        c.appendChild(tip);
+        c.appendChild(en);
+        c.appendChild(zh);
+        document.getElementById('exampleModal').classList.add('show');
+      }
+    }
+
+    // 冷却 20 秒，避免频繁弹窗，需按需调整
+    setTimeout(()=>{ surpriseCooldown = false; }, 20000);
+  }
+}
+
+
+/* ───────────────────────── 事件绑定 ───────────────────────── */
+window.addEventListener('load', ()=>{ renderWords(); updateFooter(); setTimeout(()=>speechSynthesis.getVoices(), 300); });
+
+document.getElementById('prevBtn').onclick = ()=>{ prevRound(); };
+document.getElementById('nextBtn').onclick = ()=>{ nextRound(); };
+document.getElementById('toggleViewBtn').onclick = ()=>{ toggleView(); };
+document.getElementById('showAllBtn').onclick = showAllCN;
+document.getElementById('hideAllBtn').onclick = hideAllCN;
+document.getElementById('shuffleBtn').onclick = ()=>{ shuffleDeck(); };
+document.getElementById('wrongTabBtn').onclick = ()=>{ enterWrong(); };
+document.getElementById('deckTabBtn').onclick = ()=>{ leaveWrong(); };
+document.getElementById('miniGameBtn').onclick = ()=>{ openQuiz(false, '🎯 翻译挑战（输入中文义）'); };
+document.getElementById('eggBtn').onclick = confetti;
+
+document.getElementById('shuffleSentBtn').onclick = ()=>{ renderSentences(); };
+document.getElementById('showAllZhSent').onclick = showAllZh;
+document.getElementById('hideAllZhSent').onclick = hideAllZh;
+
+document.getElementById('closeEx').onclick = ()=>document.getElementById('exampleModal').classList.remove('show');
+document.getElementById('exampleModal').addEventListener('click', e=>{ if(e.target.id==='exampleModal') e.currentTarget.classList.remove('show'); });
+
+document.getElementById('closeQuiz').onclick = ()=>document.getElementById('quizModal').classList.remove('show');
+document.getElementById('quizModal').addEventListener('click', e=>{ if(e.target.id==='quizModal') e.currentTarget.classList.remove('show'); });
+</script>
+</body>
+</html>
