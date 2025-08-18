@@ -6,72 +6,114 @@
 <title>Day11 · 9词回合训练｜词卡 + 例句 + 错题本</title>
 <style>
   :root{
-    /* —— 主题：调亮（冰白微蓝） —— */
-    --bg:#f7faff;             /* 背景主色更亮 */
-    --bg2:#eaf2ff;
-    --txt:#0f1a2e;            /* 主文字改深色 */
-    --muted:#5c6a86;          /* 次级文字 */
-    --card:rgba(255,255,255,.86); /* 玻璃卡更亮 */
+    /* —— Palette（你的色板） —— */
+    /* 主体冷灰蓝 */
+    --navy:#151B32;           /* 夜色海军蓝（背景起点/描边建议） */
+    --steel:#232E51;          /* 钢铁深蓝 */
+    --indigo:#34496D;         /* 靛蓝 */
+    --slate:#5E6E93;          /* 石板灰蓝（主题色） */
+    --mist1:#708AAA;          /* 雾霭灰蓝（深） */
+    --mist2:#A8B1C9;          /* 雾霭灰蓝（浅） */
+    --mist3:#B7C6D8;          /* 雾霭灰蓝（更浅） */
+    --cool:#999BB0;           /* 冷灰紫 */
+
+    /* 高光/主体 */
+    --ice:#DFDDE1;            /* 冰白/银白 */
+    --lav:#C8BAC8;            /* 淡薰衣草灰（若隐） */
+
+    /* 点缀红（极少量） */
+    --crimson:#E41232;        /* 绯红（强调/按钮） */
+    --rose:#E41E4B;           /* 深绛红（强调梯度2） */
+    --wine:#A42C53;           /* 酒红 */
+
+    /* 肤色/阴影（基本不用） */
+    --skin:#DAC6B6;           /* 温暖米杏 */
+    --roseShadow:#96616E;     /* 低饱和玫瑰影 */
+
+    /* —— 主题变量 —— */
+    --bg: var(--navy);                    /* 背景渐变起点 */
+    --bg2: var(--mist2);                  /* 背景渐变终点 */
+    --txt:#F7F7FA;                        /* 页面主文字：冰白（暗底） */
+    --muted:var(--mist3);                 /* 次级文字 */
+    --card:rgba(247,247,250,.80);         /* 冰白半透明 ≈80%（卡片底） */
     --blur:10px;
-    --stroke:rgba(22,34,66,.12);
-    --accent:#4d7cff;         /* 点缀蓝 */
-    --accent2:#86b2ff;        /* 次点缀 */
-    --ok:#2fa66e;             /* 正向色 */
-    --warn:#e6a900;           /* 提示色 */
-    --danger:#e05b72;         /* 危险色 */
+    --stroke:rgba(21,27,50,.22);          /* 深蓝描边 */
+
+    /* 强调色：少量红色抓眼 */
+    --accent:var(--crimson);
+    --accent2:var(--rose);
+
+    /* 状态色 */
+    --ok:var(--slate);
+    --warn:var(--roseShadow);
+    --danger:var(--crimson);
+
+    /* 浅卡片上的文字色 */
+    --ink-card:#151B32;
   }
+
   html,body{height:100%}
   body{
     margin:0;
     background:
-      radial-gradient(900px 55% at 20% -10%, #e6eeff 0%, transparent 60%),
-      radial-gradient(900px 55% at 120% 30%, #f0f5ff 0%, transparent 50%),
+      radial-gradient(1100px 65% at 8% -10%, rgba(35,46,81,.55) 0%, transparent 60%),
+      radial-gradient(900px 55% at 115% 25%, rgba(52,73,109,.45) 0%, transparent 55%),
       linear-gradient(180deg,var(--bg),var(--bg2));
     color:var(--txt);
     font:16px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Hiragino Sans GB",sans-serif;
   }
+
   .app{max-width:1000px;margin:0 auto;padding:20px 16px 28px}
   header.head{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
   .title{display:flex;align-items:center;gap:10px}
-  .title h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px}
-  .badge{font-size:12px;padding:4px 8px;border:1px solid var(--stroke);border-radius:999px;background:rgba(255,255,255,.7);color:var(--muted)}
+  .title h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px;color:var(--mist3)}
+  .badge{font-size:12px;padding:4px 8px;border:1px solid var(--stroke);border-radius:999px;background:rgba(223,221,225,.18);color:var(--mist3)}
+
   .controls{display:flex;gap:8px;flex-wrap:wrap}
   .btn{
     appearance:none;border:1px solid var(--stroke);
-    background:linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.85));
-    color:var(--txt);padding:8px 12px;border-radius:10px;font-size:14px;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.86));
+    color:var(--ink-card);padding:8px 12px;border-radius:10px;font-size:14px;cursor:pointer;
     backdrop-filter:blur(var(--blur));transition:.2s;display:inline-flex;align-items:center;gap:8px
   }
-  .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px -16px rgba(15,26,46,.25)}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px -16px rgba(15,26,46,.35)}
   .btn[disabled]{opacity:.55;cursor:not-allowed}
-  .btn.primary{border-color:rgba(77,124,255,.35);box-shadow:inset 0 0 0 1px rgba(77,124,255,.2)}
-  .btn.ghost{background:transparent}
+
+  .btn.primary{
+    border-color:rgba(228,18,50,.35);
+    box-shadow:inset 0 0 0 1px rgba(228,18,50,.25);
+    background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.90));
+    color:var(--ink-card);
+  }
+  .btn.ghost{background:transparent;color:var(--mist3)}
 
   .tabs{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
-  .tabs .tab{padding:6px 12px;border:1px solid var(--stroke);border-radius:999px;font-size:13px;color:var(--muted);cursor:pointer}
-  .tabs .tab.active{color:var(--txt);border-color:rgba(77,124,255,.35);box-shadow:inset 0 0 0 1px rgba(77,124,255,.2)}
+  .tabs .tab{padding:6px 12px;border:1px solid var(--stroke);border-radius:999px;font-size:13px;color:var(--mist3);cursor:pointer;background:rgba(255,255,255,.03)}
+  .tabs .tab.active{color:var(--ice);border-color:rgba(94,110,147,.45);box-shadow:inset 0 0 0 1px rgba(94,110,147,.35)}
 
   /* 网格卡片 */
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
-  @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:760px){.grid{grid-template-columns:repeat(2,1,fr)}}
   @media (max-width:520px){.grid{grid-template-columns:1fr}}
   .card{
     position:relative;padding:16px;border-radius:16px;
     background:var(--card);
     border:1px solid var(--stroke);
-    backdrop-filter:blur(var(--blur));min-height:120px;display:flex;flex-direction:column;gap:8px
+    backdrop-filter:blur(var(--blur));
+    min-height:120px;display:flex;flex-direction:column;gap:8px;
+    color:var(--ink-card);
   }
-  .term{font-size:22px;font-weight:800;letter-spacing:.2px;margin:6px 0} /* ↑ 稍微放大 */
-  .cn{color:var(--ok);font-size:18px;display:none}                       /* ↑ 稍微放大 */
+  .term{font-size:22px;font-weight:800;letter-spacing:.2px;margin:6px 0;color:var(--navy)}
+  .cn{color:var(--ok);font-size:18px;display:none}
   .cn.show{display:block}
-  .meta{font-size:12px;color:var(--muted)}
+  .meta{font-size:12px;color:var(--slate)}
   .toolbar{position:absolute;top:8px;right:8px;display:flex;gap:6px}
   .iconbtn{
-    border:1px solid var(--stroke);background:rgba(255,255,255,.9);
+    border:1px solid var(--stroke);background:rgba(255,255,255,.92);
     width:34px;height:32px;border-radius:9px;display:grid;place-items:center;
-    color:#5a6b85;cursor:pointer
+    color:var(--slate);cursor:pointer
   }
-  .iconbtn.active{color:var(--accent);box-shadow:inset 0 0 0 1px rgba(77,124,255,.35)}
+  .iconbtn.active{color:var(--crimson);box-shadow:inset 0 0 0 1px rgba(228,18,50,.35)}
   .iconbtn:hover{transform:translateY(-1px)}
 
   /* 例句区域 */
@@ -79,31 +121,32 @@
   .sentence{
     padding:16px 16px;border-radius:14px;background:var(--card);
     border:1px solid var(--stroke);backdrop-filter:blur(var(--blur));
+    color:var(--ink-card);
   }
-  .en{font-weight:700}
+  .en{font-weight:700;color:var(--navy)}
   .zh{display:none;color:var(--ok)}
   .zh.show{display:block;margin-top:6px}
 
-  footer.foot{margin-top:16px;display:flex;gap:10px;align-items:center;justify-content:space-between;color:var(--muted)}
-  .meter{height:8px;background:rgba(15,26,46,.07);border-radius:999px;overflow:hidden;flex:1}
+  footer.foot{margin-top:16px;display:flex;gap:10px;align-items:center;justify-content:space-between;color:var(--mist3)}
+  .meter{height:8px;background:rgba(247,247,250,.15);border-radius:999px;overflow:hidden;flex:1}
   .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
 
   /* 模态层 */
-  .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(10,12,20,.25);backdrop-filter:blur(6px);z-index:40}
+  .modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(10,12,20,.35);backdrop-filter:blur(6px);z-index:40}
   .modal.show{display:grid}
   .dialog{
     width:min(720px,92vw);
     background:linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.92));
-    border:1px solid var(--stroke);border-radius:16px;padding:18px;color:var(--txt)
+    border:1px solid var(--stroke);border-radius:16px;padding:18px;color:var(--ink-card)
   }
 
-  /* 迷你彩纸 */
+  /* 彩纸 */
   .burst{position:fixed;pointer-events:none;inset:0;overflow:hidden;z-index:60}
   .piece{position:absolute;width:8px;height:12px;opacity:0;animation:pop 1s ease-out forwards}
   @keyframes pop{0%{transform:translate(var(--x),var(--y)) rotate(0) scale(.8);opacity:1}
                  100%{transform:translate(var(--x2),var(--y2)) rotate(720deg) scale(1);opacity:0}}
 
-  .hint{font-size:12px;color:var(--muted)}
+  .hint{font-size:12px;color:var(--mist1)}
 </style>
 </head>
 <body>
@@ -151,18 +194,18 @@
   <div class="modal" id="exampleModal" aria-hidden="true">
     <div class="dialog">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <h3 id="exTitle" style="margin:0">例句</h3>
+        <h3 id="exTitle" style="margin:0;color:#151B32">例句</h3>
         <button class="btn" id="closeEx">关闭</button>
       </div>
       <div style="margin-top:10px" id="exContent"></div>
     </div>
   </div>
 
-  <!-- 迷你挑战弹窗（通用，用于正常挑战 + 偶遇测验） -->
+  <!-- 翻译挑战弹窗 -->
   <div class="modal" id="quizModal" aria-hidden="true">
     <div class="dialog">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <h3 id="quizTitle" style="margin:0">🎯 翻译挑战（输入中文义）</h3>
+        <h3 id="quizTitle" style="margin:0;color:#151B32">🎯 翻译挑战（输入中文义）</h3>
         <button class="btn" id="closeQuiz">关闭</button>
       </div>
       <div id="quizWrap" style="margin-top:12px"></div>
@@ -172,305 +215,334 @@
   <div class="burst" id="burst"></div>
 
 <script>
-/* ───────────────────────── 数据：新词库（唯一词条） ───────────────────────── */
-/* 只写词和中文义；例句由生成器动态拼出，并且每句自动夹带 3 个同表词汇 */
+/* ───────────────────────── 词库（唯一词条） ───────────────────────── */
+/* 这里放的是你给我的新增那批词（可继续扩展）。若你有更早的 base，也可以合并。 */
 const base = [
+  {t:'overcome', cn:'克服', ex:[
+    'To overcome insecurity, she adopted an incremental strategy and postponed any restrictive options until more data became available.',
+    '为克服不安全感，她采用渐进式策略，并将任何带限制性的选项推迟到有更多数据可用为止。'
+  ]},
+  {t:'encourage', cn:'鼓励', ex:[
+    'We encourage international students to register early, adapt to the new ecosystem, and engage with the survey before choosing an option.',
+    '我们鼓励国际学生尽早注册，适应新的生态系统，并在选择选项前先参与问卷。'
+  ]},
+  {t:'recommend', cn:'推荐；建议', ex:[
+    'The accountant would recommend a conservative loan strategy to reduce potential loss and maintain steady cash movement.',
+    '会计会建议采取保守的贷款策略，以降低潜在损失并保持现金流稳定。'
+  ]},
+  {t:'expose', cn:'暴露；揭示', ex:[
+    'The survey exposed a substantial shortage of proper maintenance in traditional housing, resulting in negative health consequences.',
+    '这份调查揭示出传统住宅在规范维护方面存在显著短缺，带来不良的健康后果。'
+  ]},
+  {t:'postpone', cn:'推迟', ex:[
+    'Due to an urgent notification, we postponed the harvest and arranged an alternative option instead.',
+    '由于收到紧急通知，我们推迟了收获，并改为安排了备选方案。'
+  ]},
+  {t:'arrange', cn:'安排；筹划', ex:[
+    'Please arrange a proper recipe for the event, reserve a venue at equal distance, and send notifications to all accounts.',
+    '请为活动安排合适的菜单，预留距离相近的场地，并向所有账号发送通知。'
+  ]},
+  {t:'conserve', cn:'保护；保存', ex:[
+    'To conserve the coastal habitat, the plan adopts restrictive zoning and encourages residents to reduce water use.',
+    '为保护海岸栖息地，方案采用了限制性分区，并鼓励居民减少用水。'
+  ]},
+  {t:'discourage', cn:'阻止；打消', ex:[
+    'The policy discourages unintentional waste by exposing the real cost and recommending adaptable recipes to reuse leftovers.',
+    '该政策通过揭示真实成本并推荐可调整的菜谱来再利用剩菜，从而抑制无意的浪费。'
+  ]},
+  {t:'reduce', cn:'减少；降低', ex:[
+    'We reduced rent by adopting a broader pricing option, which significantly increased potential engagement.',
+    '我们采用更宽泛的定价选项来降低房租，从而显著提升了潜在参与度。'
+  ]},
+  {t:'request', cn:'请求；申请', ex:[
+    'Your request to postpone the loan requires approval; please register online and quote your account number.',
+    '你关于推迟贷款的请求需要审批；请在线注册并注明你的账号。'
+  ]},
+  {t:'responsibility', cn:'责任', ex:[
+    'It is your responsibility to arrange proper maintenance and report any loss immediately.',
+    '安排规范维护并立刻上报任何损失是你的责任。'
+  ]},
   {t:'consequence', cn:'后果；结果', ex:[
-    'Your choice has a consequence: despite the risks, you propose an expansion that may not make sense.',
-    '你的选择会带来后果：尽管有风险，你仍提议扩张，而这未必讲得通。'
+    'One consequence of a restrictive strategy is reduced engagement and a shortage of available options.',
+    '限制性策略的一个后果是参与度降低、可用选项短缺。'
   ]},
-  {t:'instead', cn:'代替；反而', ex:[
-    'Instead of a long presentation, we select a brief drill to assess the team’s response.',
-    '我们不做冗长汇报，改为选择一次简短演练来评估团队的反应。'
+  {t:'psychology', cn:'心理学；心理', ex:[
+    'Consumer psychology shows that broad options can encourage choice but also expose insecurity.',
+    '消费者心理表明，宽泛的选项能鼓励选择，但也可能暴露不安全感。'
   ]},
-  {t:'besides', cn:'此外；除…之外', ex:[
-    'Besides the ceremony, the plan includes a memorial visit and an appointment to consult a native guide.',
-    '除仪式外，计划还包含参观纪念碑以及预约咨询本地向导。'
+  {t:'insecurity', cn:'不安全感', ex:[
+    'Her insecurity about the novel concept discouraged her from adopting the approach despite substantial potential.',
+    '她对这一新概念的不安全感使她放弃采用这种方法，尽管其潜力可观。'
+  ]},
+  {t:'approach', cn:'方法；途径', ex:[
+    'Our approach is to survey the ecosystem, register the risks, and adapt the strategy before any attack on the problem.',
+    '我们的方法是先调研生态系统、登记风险并调整策略，再着手攻克问题。'
+  ]},
+  {t:'concept', cn:'概念；观念', ex:[
+    'The concept of equal access recommends reducing distance barriers and providing available loans.',
+    '“平等获取”的概念建议减少距离障碍，并提供可用的贷款。'
+  ]},
+  {t:'maintenance', cn:'维护；保养', ex:[
+    'Regular maintenance reduces unintentional failures and keeps the wheel assembly steady during movement.',
+    '定期维护可减少无意的故障，并在运动中保持车轮组件的稳定。'
+  ]},
+  {t:'ecosystem', cn:'生态系统', ex:[
+    'A healthy ecosystem requires habitat conservation, proper waste reduction, and engagement across international borders.',
+    '健康的生态系统需要栖息地保护、规范的减废，以及跨国参与。'
+  ]},
+  {t:'habitat', cn:'栖息地', ex:[
+    'The team surveyed the wetland habitat and adopted a strategy to reserve corridors for animal movement.',
+    '团队调查了湿地栖息地，并采取策略预留动物迁徙廊道。'
+  ]},
+  {t:'loan', cn:'贷款', ex:[
+    'We recommend a loan only if the accountant can account for the risk of loss and quote a proper rate.',
+    '只有当会计能清楚核算损失风险并报出合适利率时，我们才建议贷款。'
+  ]},
+  {t:'notification', cn:'通知；通告', ex:[
+    'You will receive a notification to register, arrange your duty schedule, and confirm any urgent request.',
+    '你将收到通知以进行注册、安排值班日程，并确认任何紧急请求。'
+  ]},
+  {t:'strategy', cn:'策略；战略', ex:[
+    'Our strategy is to broaden available options, discourage negative attacks, and encourage steady engagement.',
+    '我们的策略是扩大可用选项、抑制负面攻击，并鼓励稳定参与。'
+  ]},
+  {t:'unintentional', cn:'无意的；非本意的', ex:[
+    'An unintentional data exposure can significantly reduce trust and require international notification by law.',
+    '一次无意的数据泄露会显著降低信任，并依法需要进行国际通报。'
+  ]},
+  {t:'available', cn:'可用的；可获得的', ex:[
+    'Several available options allow you to postpone payment, adopt a cheaper rent, or request a loan.',
+    '多种可用选项允许你推迟付款、采用更低的房租，或申请贷款。'
+  ]},
+  {t:'international', cn:'国际的', ex:[
+    'International students often adopt flexible strategies to overcome distance and register despite time zones.',
+    '国际学生往往采用灵活策略来克服距离障碍，并在时差下完成注册。'
+  ]},
+  {t:'novel', cn:'新颖的；小说的', ex:[
+    'The novel ecosystem model recommends conserving habitat while allowing adaptable human movement.',
+    '这个新颖的生态系统模型建议在保护栖息地的同时，允许可调整的人类活动。'
+  ]},
+  {t:'restrictive', cn:'限制性的', ex:[
+    'Restrictive policies may discourage engagement, reduce potential growth, and postpone novel approaches.',
+    '限制性政策可能抑制参与、降低潜在增长，并推迟新方法的实施。'
+  ]},
+  {t:'substantial', cn:'大量的；实质性的', ex:[
+    'A substantial shortage of parts forced us to adopt a broad procurement strategy and postpone the project.',
+    '零件的大量短缺迫使我们采取广域采购策略，并推迟项目。'
+  ]},
+  {t:'traditional', cn:'传统的', ex:[
+    'Traditional recipes can be adapted to reduce sugar and respect restrictive diets without losing flavor.',
+    '传统菜谱可以进行改良以减少糖分，并尊重限制性饮食，同时不失风味。'
+  ]},
+  {t:'significantly', cn:'显著地', ex:[
+    'The new approach significantly reduced maintenance costs and encouraged broader engagement.',
+    '新方法显著降低了维护成本，并鼓励了更广泛的参与。'
+  ]},
+  {t:'type', cn:'类型', ex:[
+    'Please select the account type and register your option before the deadline.',
+    '请在截止日期前选择账号类型并登记你的选项。'
+  ]},
+  {t:'movement', cn:'运动；移动', ex:[
+    'The survey recorded steady movement across the bridge despite the distance and strong wind.',
+    '尽管距离远且风力强，调查仍记录到稳定的桥上通行。'
+  ]},
+  {t:'shortage', cn:'短缺', ex:[
+    'The report quotes a shortage of accountants, which could reduce available loan options and increase rent.',
+    '报告引用的数据显示会计人员短缺，这可能减少可用贷款选项并推高房租。'
+  ]},
+  {t:'loss', cn:'损失', ex:[
+    'To prevent loss, the strategy recommends adopting backups and arranging proper maintenance.',
+    '为防止损失，策略建议采用备份并安排规范维护。'
+  ]},
+  {t:'broad', cn:'广泛的；宽的', ex:[
+    'We prefer a broad approach that engages multiple ecosystems and international partners.',
+    '我们更倾向于一种能联结多重生态系统与国际伙伴的广泛方法。'
+  ]},
+  {t:'broaden', cn:'拓宽；扩大', ex:[
+    'We broaden options to encourage equal access and reduce insecurity.',
+    '我们扩大选项以鼓励平等获取，并降低不安全感。'
+  ]},
+  {t:'attack', cn:'抨击；攻击', ex:[
+    'A negative attack on the concept only exposes insecurity and discourages engagement.',
+    '对该概念的负面抨击只会暴露不安全感并打击参与。'
+  ]},
+  {t:'register', cn:'注册；登记', ex:[
+    'You must register for the survey, request a quote, and confirm your preferred option.',
+    '你必须登记参与调查、索取报价，并确认你的优选方案。'
+  ]},
+  {t:'potential', cn:'潜力；潜在的', ex:[
+    'The accountant evaluated the potential loss and recommended postponing any loan.',
+    '会计评估了潜在损失，并建议暂缓任何贷款。'
+  ]},
+  {t:'option', cn:'选项', ex:[
+    'One option is to rent equipment; another is to adopt a maintenance plan to reduce costs.',
+    '一个选项是租设备；另一个是采用维护计划来降低成本。'
+  ]},
+  {t:'adapt', cn:'适应；改编', ex:[
+    'We adapted the traditional recipe to conserve water and respect cultural habits.',
+    '我们改良了传统食谱，以节水并尊重文化习惯。'
+  ]},
+  {t:'adaptable', cn:'可适应的；可调整的', ex:[
+    'An adaptable strategy allows international teams to overcome distance and engage steadily.',
+    '可调整的策略能让国际团队克服距离并稳定参与。'
+  ]},
+  {t:'account', cn:'账户；解释；考虑', ex:[
+    'Please account for unintentional costs and quote a more realistic, substantial budget.',
+    '请把无意成本计算在内，并给出更为合理、实质的预算报价。'
+  ]},
+  {t:'accountant', cn:'会计', ex:[
+    'The accountant arranged notifications, registered the loan, and recommended a conservative approach.',
+    '会计安排了通知，登记了贷款，并建议采用保守做法。'
+  ]},
+  {t:'adopt', cn:'采用；收养', ex:[
+    'They adopted a restrictive policy to conserve habitat while offering available relocation options.',
+    '他们采用限制性政策来保护栖息地，同时提供可用的迁移选项。'
+  ]},
+  {t:'distance', cn:'距离', ex:[
+    'Long distance can discourage engagement, but international tools significantly reduce the impact.',
+    '较远距离可能打击参与，但国际化工具能显著降低其影响。'
+  ]},
+  {t:'equal', cn:'平等的；相等的', ex:[
+    'Our policy ensures equal access, recommending available loans and reduced rent for students.',
+    '我们的政策确保平等获取，推荐为学生提供可用贷款并降低房租。'
+  ]},
+  {t:'instead', cn:'相反；而不是', ex:[
+    'Instead of an urgent attack, we adopted a steady strategy and broadened options.',
+    '我们没有急于“进攻”，而是采用稳健策略并扩大了选项。'
   ]},
   {t:'moreover', cn:'而且；此外', ex:[
-    'Moreover, the assistant will confirm your position and assign a female speaker for the presentation.',
-    '而且，助理会确认你的座位，并为汇报指派一位女讲者。'
-  ]},
-  {t:'choice', cn:'选择', ex:[
-    'Her choice to retire was responsible and made sense despite the desire for expansion.',
-    '尽管仍渴望扩张，她选择退休是负责任且合乎情理的。'
-  ]},
-  {t:'response', cn:'回应；反应', ex:[
-    'The response was amazing; the board approve the expansion and propose to integrate a wider range.',
-    '反馈很亮眼；董事会批准了扩张，并提议整合更广的范围。'
+    'Moreover, the survey quoted significant improvement after we encouraged adaptable, international cooperation.',
+    '此外，调查引用的数据表明，在我们鼓励可调整的国际合作后，改善显著。'
   ]},
   {t:'previous', cn:'先前的', ex:[
-    'The previous assess report did not observe the contrast in appetite across the age range.',
-    '先前的评估报告未观察到不同年龄段在“偏好”上的差异。'
+    'Compared with the previous approach, the novel strategy reduced maintenance costs and broadened engagement.',
+    '与先前方法相比，这一新策略降低了维护成本并扩大了参与。'
+  ]},
+  {t:'choice', cn:'选择', ex:[
+    'Her choice to postpone the loan was recommended by the accountant after a negative risk survey.',
+    '在一份负面风险评估后，会计建议她推迟贷款，她也据此作出选择。'
   ]},
   {t:'wheel', cn:'轮子；车轮', ex:[
-    'Without a front wheel, the hunt truck lost balance at the edge of the muddy setting.',
-    '没有前轮，狩猎用卡车在泥泞环境的边缘失去平衡。'
+    'A loose wheel can cause loss of control; proper maintenance is not optional.',
+    '轮子松动会导致失控；规范维护绝不是“可有可无”。'
+  ]},
+  {t:'besides', cn:'此外；除…之外', ex:[
+    'Besides rent, your account shows a substantial loan and several international notifications.',
+    '除房租外，你的账户还显示有一笔可观贷款和多条国际通知。'
+  ]},
+  {t:'response', cn:'回应；反应', ex:[
+    'Our response was to adopt a broad strategy, encourage engagement, and reduce restrictive barriers.',
+    '我们的回应是采取广域策略、鼓励参与，并减少限制性壁垒。'
   ]},
   {t:'harvest', cn:'收获；收割', ex:[
-    'The harvest festival ceremony will involve a native dance and a presentation by the assistant.',
-    '丰收节的仪式会包含本地舞蹈，以及助理带来的展示。'
+    'To protect the ecosystem, we arranged surveys of animal movement and set restrictive rules on harvest seasons.',
+    '为保护生态系统，我们安排了动物迁徙调查，并对收获季设定了限制性规则。'
   ]},
-  {t:'ceremony', cn:'仪式', ex:[
-    'At the ceremony, we observe a silence by the memorial and confirm the schedule.',
-    '在仪式上，我们在纪念碑前默哀，并确认后续日程。'
+  {t:'decorate', cn:'装饰；布置', ex:[
+    'We decorated the traditional venue, arranged recipes, and encouraged guests to engage and interact.',
+    '我们布置了传统场地，安排了菜单，并鼓励嘉宾积极互动。'
   ]},
-  {t:'drill', cn:'训练；演练；钻', ex:[
-    'The safety drill will require students to concentrate, select exits, and follow the assistant’s position signs.',
-    '安全演练要求学生专注、选择出口，并跟随助理的指示牌。'
+  {t:'survey', cn:'调查；测量', ex:[
+    'The national survey exposed a shortage of habitat and recommended conserving broad corridors.',
+    '全国调查揭示栖息地短缺，并建议保护宽阔的生态廊道。'
   ]},
-  {t:'hunt', cn:'狩猎；搜寻', ex:[
-    'They hunt for evidence beyond the previous figure to evaluate the contrast in results.',
-    '他们寻找超出先前数据的证据，以评估结果的差异。'
+  {t:'reserve', cn:'预订；保留', ex:[
+    'Please reserve seats at equal distance and request a vegetarian recipe if needed.',
+    '请预订彼此距离相近的座位，如需素食菜单请提出申请。'
   ]},
-  {t:'observe', cn:'观察；遵守', ex:[
-    'We observe that independent learners tend to consult early and settle problems instead of delaying.',
-    '我们观察到独立型学习者更倾向于尽早请教并解决问题，而非拖延。'
+  {t:'interact', cn:'互动；交互', ex:[
+    'Students interact in international groups, adopt adaptable strategies, and engage despite distance.',
+    '学生在国际小组中互动，采用可调整策略，并不因距离而放弃参与。'
   ]},
-  {t:'essential', cn:'必要的；本质的', ex:[
-    'Regular measure of progress is essential to approve budgets and prevent risky expansion.',
-    '定期量化进度是必要的，这有助于批准预算并避免高风险扩张。'
+  {t:'negative', cn:'消极的；负面的', ex:[
+    'Negative quotes on social media significantly reduced engagement and exposed insecurity.',
+    '社交媒体上的负面言论显著降低了参与度，并暴露出不安全感。'
   ]},
-  {t:'assistant', cn:'助手；助理', ex:[
-    'The assistant will assign seats, confirm appointments, and integrate late arrivals into the ceremony.',
-    '助理会分配座位、确认预约，并把迟到者融入到仪式流程中。'
+  {t:'result', cn:'结果；导致', ex:[
+    'The result of the strategy was substantial: we reduced rent, broadened options, and encouraged steady adoption.',
+    '该策略的结果是显著的：我们降低了房租、扩大了选项，并鼓励了稳定采纳。'
   ]},
-  {t:'female', cn:'女性的；雌性', ex:[
-    'The female engineer evaluate options and propose a balanced range of solutions.',
-    '这位女工程师评估了多种方案，并提出了兼顾平衡的解法范围。'
+  {t:'demand', cn:'需求；要求', ex:[
+    'High demand and a shortage of parts forced us to postpone production and request international support.',
+    '高需求与零件短缺迫使我们推迟生产，并寻求国际支持。'
   ]},
-  {t:'native', cn:'本地的；母语的', ex:[
-    'A native speaker will consult students, assess pronunciation, and select particular drills.',
-    '一位母语者将为学生提供咨询、评估发音，并选择针对性的练习。'
+  {t:'proper', cn:'合适的；正当的', ex:[
+    'Proper maintenance and steady movement reduce the risk of wheel failure.',
+    '规范的维护与平稳的运动能降低车轮故障风险。'
   ]},
-  {t:'instance', cn:'实例；例子', ex:[
-    'For instance, a presentation may involve contrast and require the speaker to observe time limits.',
-    '例如，一场报告可能涉及对比，并要求讲者遵守时间限制。'
+  {t:'urgent', cn:'紧急的', ex:[
+    'An urgent notification asked us to arrange a loan and register the account immediately.',
+    '一则紧急通知要求我们立即安排贷款并登记账户。'
   ]},
-  {t:'attach', cn:'附上；附着；系上', ex:[
-    'Please attach your assess form and confirm the appointment before the presentation.',
-    '请在汇报前附上评估表并确认预约时间。'
+  {t:'recipe', cn:'菜谱；配方', ex:[
+    'This novel recipe adapts traditional flavors, reduces sugar, and respects restrictive diets.',
+    '这道新配方在保留传统风味的同时减少了糖分，并尊重限制性饮食。'
   ]},
-  {t:'struggle', cn:'挣扎；斗争', ex:[
-    'They struggle to make sense of the figure, so they consult the assistant and settle on a new measure.',
-    '他们难以理解这组数据，于是请教助理，并最终确定了新的度量方式。'
+  {t:'regard', cn:'关于；看待', ex:[
+    'With regard to rent, one option is to request a loan; another is to adopt a savings strategy.',
+    '关于房租，一个选项是申请贷款；另一个是采用储蓄策略。'
   ]},
-  {t:'responsible', cn:'负责的；有责任的', ex:[
-    'A responsible manager will evaluate risk, prevent scope creep, and assign clear positions.',
-    '负责任的经理会评估风险、避免范围膨胀，并清晰分配职责。'
-  ]},
-
-  {t:'content', cn:'内容；（adj.）满意的', ex:[
-    'The content contrasts previous claims and will require expansion to integrate the new data.',
-    '这些内容与先前结论形成对比，需要扩展以整合新数据。'
-  ]},
-  {t:'tend', cn:'倾向于；照料', ex:[
-    'Teams tend to approve small changes, but when leaders propose expansion beyond the normal range, they hesitate.',
-    '团队倾向于批准小改动，但当领导提议超出常规范围的扩张时，他们会犹豫。'
-  ]},
-  {t:'prevent', cn:'防止；阻止', ex:[
-    'Clear directions and early consult can prevent confusion and make sense to everyone involved.',
-    '清晰指示与尽早请教能防止混乱，并让所有参与者觉得合理。'
-  ]},
-  {t:'presentation', cn:'演示；报告', ex:[
-    'Her presentation contrasts two settings, evaluate risks, and propose a responsible position.',
-    '她的报告对比了两种情境，评估了风险，并提出了负责的立场。'
-  ]},
-  {t:'affection', cn:'喜爱；感情', ex:[
-    'Out of affection and respect, they built a memorial and observed a quiet ceremony.',
-    '出于感情与尊重，他们建起了纪念碑，并举行了安静的仪式。'
+  {t:'rent', cn:'租金；租用', ex:[
+    'We negotiated the rent and adopted a strategy to reduce costs without sacrificing maintenance.',
+    '我们议定了房租，并采用策略在不牺牲维护的前提下降低成本。'
   ]},
   {t:'respect', cn:'尊重；方面', ex:[
-    'We respect the assistant’s position and will confirm appointments instead of cutting the line.',
-    '我们尊重助理的安排，会确认预约而不是插队。'
+    'We respect international diversity and encourage equal opportunities to engage and register.',
+    '我们尊重国际多样性，并鼓励人人享有平等参与与注册的机会。'
   ]},
-  {t:'figure', cn:'数字；人物；身材；认为', ex:[
-    'The latest figure suggests expansion; moreover, assess teams approve the plan after a drill.',
-    '最新数据指向扩张；而且，评审小组在演练后批准了方案。'
+  {t:'duty', cn:'职责；义务', ex:[
+    'It is your duty to account for expenses, arrange maintenance, and respond to urgent notifications.',
+    '你有义务核算开销、安排维护并对紧急通知做出回应。'
   ]},
-  {t:'pose', cn:'造成；摆姿势', ex:[
-    'The policy may pose a risk to balance and require leaders to evaluate and consult.',
-    '该政策可能对平衡造成风险，需要领导层评估并请教专家。'
+  {t:'engage', cn:'参与；吸引', ex:[
+    'We engage the community with a broad, adaptable approach that significantly reduces insecurity.',
+    '我们以广泛且可调整的方法动员社区，从而显著降低不安全感。'
   ]},
-  {t:'desire', cn:'渴望；欲望', ex:[
-    'Her desire to be independent led her to select a particular course range beyond the normal track.',
-    '她渴望独立，因此选择了超出常规路径的特定课程范围。'
+  {t:'steady', cn:'稳定的；稳步的', ex:[
+    'A steady approach—survey, register, and adapt—reduced loss and improved potential.',
+    '稳健的方法——调研、登记与适应——减少了损失并提升了潜力。'
   ]},
-
-  {t:'persuade', cn:'说服', ex:[
-    'We tried to persuade the board to approve expansion by presenting clear measures and contrast.',
-    '我们通过展示清晰的措施与对比来设法说服董事会批准扩张。'
-  ]},
-  {t:'memorial', cn:'纪念碑；纪念馆', ex:[
-    'The city built a memorial to native heroes and held a ceremony that involved students.',
-    '城市为本地英雄建起纪念碑，并举行了包含学生参与的仪式。'
-  ]},
-  {t:'settle', cn:'解决；安顿', ex:[
-    'They settle the dispute by consulting experts, evaluating options, and confirming the final position.',
-    '他们通过咨询专家、评估选项并确认最终立场来解决争端。'
-  ]},
-  {t:'involve', cn:'涉及；牵涉', ex:[
-    'The project will involve an assistant team to integrate tools and assign responsible roles.',
-    '该项目将涉及一支助理团队，用于整合工具并分配责任角色。'
-  ]},
-  {t:'appetite', cn:'食欲；渴望', ex:[
-    'Appetite for risk is beyond normal this quarter; the board will assess and balance expansion.',
-    '本季度的风险偏好高于常态；董事会将评估并平衡扩张。'
-  ]},
-  {t:'measure', cn:'测量；措施', ex:[
-    'We measure outcomes, contrast them with previous data, and make sense of the consequence.',
-    '我们度量结果，与先前数据做对比，并理解其后果。'
-  ]},
-  {t:'setting', cn:'环境；设置', ex:[
-    'In a clinical setting, researchers observe responses, evaluate range, and prevent bias.',
-    '在临床环境中，研究者会观察反应、评估范围并防止偏差。'
-  ]},
-  {t:'select', cn:'选择', ex:[
-    'Please select a female speaker for the ceremony and confirm the appointment with the assistant.',
-    '请为仪式选择一位女讲者，并与助理确认预约。'
-  ]},
-  {t:'contrast', cn:'对比；差异', ex:[
-    'The contrast between content and response helps evaluate whether the plan makes sense.',
-    '内容与反馈之间的对比有助于评估方案是否合理。'
-  ]},
-
-  {t:'integrate', cn:'整合；融入', ex:[
-    'We integrate the new wheel sensor to assess balance and improve beyond the previous range.',
-    '我们整合了新的车轮传感器，以评估平衡并超越先前范围。'
-  ]},
-  {t:'approve', cn:'批准；赞成', ex:[
-    'The committee will approve expansion if you attach the measure plan and confirm the budget.',
-    '若你附上措施方案并确认预算，委员会将批准扩张。'
-  ]},
-  {t:'expansion', cn:'扩展；扩建', ex:[
-    'Rapid expansion can pose risks; therefore, we require independent assess and consult before approval.',
-    '快速扩张会带来风险；因此在批准前我们需要独立评估与咨询。'
-  ]},
-  {t:'independent', cn:'独立的', ex:[
-    'An independent assistant can evaluate options, select a choice, and settle conflicts.',
-    '独立的助理能评估选项、作出选择并解决冲突。'
-  ]},
-  {t:'assign', cn:'分配；布置', ex:[
-    'We assign roles, integrate tools, and observe whether the workflow makes sense in this setting.',
-    '我们分配角色、整合工具，并观察该流程在此情境下是否合理。'
-  ]},
-  {t:'make sense', cn:'有道理；讲得通', ex:[
-    'It makes sense to consult native experts and evaluate contrast before you propose changes.',
-    '在你提出改动前，向本地专家请教并评估差异是有道理的。'
-  ]},
-  {t:'confirm', cn:'确认', ex:[
-    'Please confirm your appointment, attach the presentation file, and select a position near the edge.',
-    '请确认预约、附上汇报文件，并选择靠近边缘的位置。'
-  ]},
-  {t:'fortunate', cn:'幸运的', ex:[
-    'We were fortunate to harvest early data; moreover, the response was amazing across a wide range.',
-    '我们很幸运地早早收获数据；而且，反馈在广泛范围内都很出色。'
-  ]},
-  {t:'evaluate', cn:'评估；评价', ex:[
-    'We evaluate the consequence of each choice and, if necessary, propose a safer alternative.',
-    '我们评估每个选择的后果，必要时提出更安全的替代方案。'
-  ]},
-
-  {t:'require', cn:'需要；要求', ex:[
-    'Some drills require you to concentrate; besides, the setting may involve edge cases that make sense later.',
-    '有些演练需要你专注；此外，该情境可能包含稍后才看得懂的边缘情况。'
-  ]},
-  {t:'despite', cn:'尽管', ex:[
-    'Despite the struggle, the team integrate systems and approve a balanced position.',
-    '尽管艰难，团队还是整合了系统，并批准了较为平衡的立场。'
-  ]},
-  {t:'propose', cn:'提议；求婚', ex:[
-    'They propose an appointment schedule to prevent overlap and respect everyone’s range of needs.',
-    '他们提议了一份预约时间表，以防冲突并尊重每个人的需求范围。'
-  ]},
-  {t:'consult', cn:'咨询；请教', ex:[
-    'Consult the previous assess report and confirm whether expansion is still responsible.',
-    '请查阅先前的评估报告，并确认扩张是否仍属负责之举。'
-  ]},
-  {t:'position', cn:'位置；职位；立场', ex:[
-    'Her position went beyond normal; to persuade the board, she propose we attach strict measure before they approve.',
-    '她的立场超出了常规；为说服董事会，她提议在批准前附加严格的措施。'
-  ]},
-
-  {t:'amazing', cn:'令人惊叹的', ex:[
-    'The museum’s collection is amazing; moreover, native guides select particular pieces to make sense of the era.',
-    '博物馆的藏品令人惊叹；而且，本地讲解员选择了特定展品来讲清那个时代。'
-  ]},
-  {t:'collection', cn:'收藏；合集', ex:[
-    'Our collection will expand beyond the edge of the current range if the committee approve.',
-    '若委员会同意，我们的藏品将扩展到现有范围的外缘。'
-  ]},
-  {t:'balance', cn:'平衡；权衡', ex:[
-    'To balance appetite and risk, leaders evaluate data and consult independent experts.',
-    '为权衡偏好与风险，管理层评估数据并咨询独立专家。'
-  ]},
-  {t:'range', cn:'范围；幅度', ex:[
-    'The product range will integrate new features and require careful presentation to persuade users.',
-    '该产品线将整合新特性，并需要谨慎展示来打动用户。'
-  ]},
-  {t:'retire', cn:'退休；退出', ex:[
-    'He plans to retire; instead, the assistant will assume the position and assign tasks.',
-    '他打算退休；由助理接任岗位并分配任务。'
-  ]},
-  {t:'normal', cn:'正常的', ex:[
-    'Under normal conditions we observe, a brief drill can prevent panic and make sense to students.',
-    '在我们观察到的常规条件下，简短演练就能防止恐慌且对学生是合理的。'
-  ]},
-  {t:'beyond', cn:'超出；在…之外', ex:[
-    'Beyond the ceremony, the schedule includes a memorial visit and a presentation to approve funding.',
-    '除了仪式，日程还包括参观纪念碑以及一场为争取经费批准的汇报。'
-  ]},
-  {t:'edge', cn:'边缘；优势', ex:[
-    'Living at the edge of town, she struggle to keep appointments and consult native teachers.',
-    '住在城边，她很难按时赴约并向本地老师请教。'
-  ]},
-  {t:'appointment', cn:'预约；任命', ex:[
-    'Your appointment will require a presentation; please attach slides and confirm the time.',
-    '你的预约需要进行汇报；请附上幻灯并确认时间。'
-  ]},
-  {t:'assess', cn:'评估', ex:[
-    'We assess the contrast between response and content to evaluate whether the proposal makes sense.',
-    '我们评估“反馈”和“内容”的差异，以判断提案是否合理。'
-  ]},
-  {t:'concentrate', cn:'专注；集中', ex:[
-    'Concentrate during the drill; besides, observe exits and confirm your position with the assistant.',
-    '演练时请专注；此外，请观察出口并向助理确认你的位置。'
-  ]},
-  {t:'particular', cn:'特定的；特别的', ex:[
-    'In this particular setting, we assign roles, measure progress, and prevent scope creep.',
-    '在这个特定情境下，我们分配角色、度量进度，并防止范围膨胀。'
+  {t:'quote', cn:'引用；报价', ex:[
+    'Please quote the loan rate, register the account, and arrange options before you adopt a strategy.',
+    '请先报出贷款利率、登记账户并安排可选方案，再确定要采用的策略。'
   ]},
 ];
 
+/* ───────────────────────── 构建索引与状态 ───────────────────────── */
+const deckOrder = base.map(b=>b.t);               // 原始顺序，用于还原
+const map = new Map(base.map((b,i)=>[b.t,i]));    // 词到索引
+let deck = deckOrder.map(t=>base[map.get(t)]);    // 当前主词库顺序（可洗牌）
 
-/* 构建 deckOrder（9词一回合），按上面顺序即可 */
-const deckOrder = base.map(b=>b.t);
-
-
-
-/* ───────────────────────── 索引&状态 ───────────────────────── */
-const map = new Map(base.map((b,i)=>[b.t,i]));
-const deck = deckOrder.map(t=>base[map.get(t)]).filter(Boolean);
-let currentRound = 0; // 从0起
+let currentRound = 0;
 const pageSize = 9;
 let inSentencesView = false;
 let scrambled = false;
-let wrongBook = new Set(JSON.parse(localStorage.getItem('wrongBook_v1')||'[]'));
 
-/* ───────────────────────── 工具 ───────────────────────── */
+let wrongBook = new Set(JSON.parse(localStorage.getItem('wrongBook_v1')||'[]'));
+let inWrongMode = false;
+let wrongOrder = [...wrongBook]; // 用于“错题本”列表的稳定顺序（可洗牌）
+
+/* ───────────────────────── 工具函数 ───────────────────────── */
 function speak(text, lang='en-US'){
   try{
     const u = new SpeechSynthesisUtterance(text);
     const voices = speechSynthesis.getVoices();
     const en = voices.find(v=>/en[-_](US|GB)|English/i.test(v.lang)) || voices[0];
     if(en) u.voice = en; u.lang = en?.lang || lang; u.rate = 0.95; u.pitch = 1; u.volume = 1;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
   }catch(e){console.warn('TTS failed:',e)}
 }
-function saveWrong(){ localStorage.setItem('wrongBook_v1', JSON.stringify([...wrongBook])); }
+function saveWrong(){
+  localStorage.setItem('wrongBook_v1', JSON.stringify([...wrongBook]));
+  // 维护 wrongOrder 稳定顺序（遵循 Set 插入顺序）
+  wrongOrder = [...wrongBook];
+}
 function chunk(arr, size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
 function randPick(arr, k){ const a=[...arr]; a.sort(()=>Math.random()-0.5); return a.slice(0, k); }
+function getWrongDeck(){
+  // 根据 wrongOrder 取词条，保持和洗牌后的一致顺序
+  return wrongOrder.map(t=> base[map.get(t)]).filter(Boolean);
+}
 function setBar(){
   const total = inWrongMode ? getWrongDeck().length : deck.length;
   if(total <= 0){ document.getElementById('bar').style.width = '0%'; return; }
@@ -479,7 +551,7 @@ function setBar(){
   document.getElementById('bar').style.width = pct + '%';
 }
 
-/* ───────────────────────── 渲染：词卡页 ───────────────────────── */
+/* ───────────────────────── 渲染函数 ───────────────────────── */
 function renderWords(){
   inSentencesView = false;
   document.getElementById('wordsView').style.display='block';
@@ -491,6 +563,7 @@ function renderWords(){
   const totalRounds = rounds.length;
   currentRound = Math.max(0, Math.min(currentRound, Math.max(0,totalRounds-1)));
   const round = rounds[currentRound] || [];
+
   const g = document.getElementById('grid');
   g.innerHTML='';
 
@@ -499,16 +572,14 @@ function renderWords(){
     document.getElementById('roundIdx').textContent = 0;
     document.getElementById('roundTotal').textContent = 0;
     document.getElementById('roundCount').textContent = 0;
-    setBar();
-    return;
+    setBar(); return;
   }
 
   round.forEach(item=>{
     const card = document.createElement('div');
     card.className='card';
 
-    const tb = document.createElement('div');
-    tb.className='toolbar';
+    const tb = document.createElement('div'); tb.className='toolbar';
 
     const exBtn = document.createElement('button');
     exBtn.className='iconbtn'; exBtn.title='例句'; exBtn.innerHTML='💬';
@@ -517,25 +588,24 @@ function renderWords(){
     const pin = document.createElement('button');
     pin.className='iconbtn'; pin.title='加入/移出错题本'; pin.innerHTML='📌';
     if(wrongBook.has(item.t)) pin.classList.add('active');
-    pin.onclick = ()=>{ if(wrongBook.has(item.t)) wrongBook.delete(item.t); else wrongBook.add(item.t); pin.classList.toggle('active'); saveWrong(); updateFooter(); };
+    pin.onclick = ()=>{
+      if(wrongBook.has(item.t)) wrongBook.delete(item.t); else wrongBook.add(item.t);
+      pin.classList.toggle('active'); saveWrong(); updateFooter();
+    };
 
     tb.appendChild(exBtn); tb.appendChild(pin);
 
     const term = document.createElement('div');
     term.className='term'; term.textContent = item.t;
     term.setAttribute('role','button');
+
+    const cn = document.createElement('div'); cn.className='cn'; cn.textContent = item.cn;
+
     term.onclick = ()=>{ speak(item.t); cn.classList.toggle('show'); maybeSurprise(); };
 
-    const cn = document.createElement('div');
-    cn.className='cn'; cn.textContent = item.cn;
+    const meta = document.createElement('div'); meta.className='meta'; meta.textContent='点击单词：发音 + 显示中文';
 
-    const meta = document.createElement('div');
-    meta.className='meta'; meta.textContent='点击单词：发音 + 显示中文';
-
-    card.appendChild(tb);
-    card.appendChild(term);
-    card.appendChild(cn);
-    card.appendChild(meta);
+    card.appendChild(tb); card.appendChild(term); card.appendChild(cn); card.appendChild(meta);
     g.appendChild(card);
   });
 
@@ -555,7 +625,6 @@ function renderWords(){
   setBar();
 }
 
-/* ───────────────────────── 渲染：例句页（本回合随机2~3句） ───────────────────────── */
 function renderSentences(){
   inSentencesView = true;
   document.getElementById('wordsView').style.display='none';
@@ -571,17 +640,13 @@ function renderSentences(){
   if(inWrongMode && arr.length===0){
     const s = document.createElement('div'); s.className='sentence';
     s.innerHTML = '<div class="en">错题本暂无例句</div><div class="zh show">先回到词库页添加一些📌吧</div>';
-    box.appendChild(s);
-    return;
+    box.appendChild(s); return;
   }
 
   const k = Math.min(3, Math.max(2, Math.floor(Math.random()*2)+2));
   const pick = randPick(round, Math.min(k, round.length));
 
   pick.forEach(item=>{
-
-
-
     const s = document.createElement('div'); s.className='sentence';
     const en = document.createElement('div'); en.className='en'; en.textContent=item.ex[0];
     const zh = document.createElement('div'); zh.className='zh'; zh.textContent=item.ex[1];
@@ -591,10 +656,8 @@ function renderSentences(){
   });
 }
 
-/* ───────────────────────── 例句弹窗 ───────────────────────── */
+/* ───────────────────────── 弹窗 & 交互 ───────────────────────── */
 function openExample(item){
-
-
   document.getElementById('exTitle').textContent = `📘 ${item.t}`;
   const c = document.getElementById('exContent');
   c.innerHTML = '';
@@ -606,36 +669,59 @@ function openExample(item){
   document.getElementById('exampleModal').classList.add('show');
 }
 
-/* ───────────────────────── 迷你翻译挑战 ───────────────────────── */
+/* 撒花 */
+function confetti(){
+  const b = document.getElementById('burst');
+  for(let i=0;i<32;i++){
+    const p=document.createElement('div'); p.className='piece';
+    const x = (window.innerWidth/2)+'px'; const y = '20%';
+    const x2 = (Math.random()*100)+'vw'; const y2 = (60+Math.random()*40)+'vh';
+    p.style.setProperty('--x', x); p.style.setProperty('--y', y);
+    p.style.setProperty('--x2', x2); p.style.setProperty('--y2', y2);
+    p.style.background = `linear-gradient(${Math.random()*360}deg, var(--accent), var(--accent2))`;
+    p.style.left = (window.innerWidth/2)+'px'; p.style.top='10%';
+    b.appendChild(p); setTimeout(()=>p.remove(), 1000);
+  }
+}
+
+/* 翻译挑战 */
 let quizItem = null;
 function openQuiz(fromWrong=false, promptText='🎯 翻译挑战（输入中文义）'){
-  const rounds = chunk(deck, pageSize);
-  const round = inWrongMode? chunk(getWrongDeck(), pageSize)[currentRound] || [] : rounds[currentRound] || [];
-  const pool = fromWrong ? getWrongDeck() : (round.length? round : deck);
+  const roundArr = inWrongMode ? (chunk(getWrongDeck(), pageSize)[currentRound]||[]) : (chunk(deck, pageSize)[currentRound]||[]);
+  const pool = fromWrong ? getWrongDeck() : (roundArr.length ? roundArr : deck);
   if(pool.length===0){ alert('本回合暂无词条'); return; }
-  quizItem = pool[Math.floor(Math.random()*pool.length)];
+  quizItem = pool[(Math.random()*pool.length)|0];
+
   document.getElementById('quizTitle').textContent = promptText;
 
   const wrap = document.getElementById('quizWrap');
   wrap.innerHTML = '';
 
-  const q = document.createElement('div'); q.className='en'; q.style.marginBottom='8px'; q.textContent = `请翻译：${quizItem.t}`;
-  const input = document.createElement('input'); input.placeholder='输入中文意思'; input.style.width='100%'; input.style.padding='10px'; input.style.borderRadius='10px'; input.style.border='1px solid var(--stroke)'; input.style.background='rgba(255,255,255,.9)'; input.style.color='var(--txt)';
+  const q = document.createElement('div'); q.className='en'; q.style.marginBottom='8px';
+  q.textContent = `请翻译：${quizItem.t}`;
+
+  const input = document.createElement('input');
+  input.placeholder='输入中文意思';
+  input.style.width='100%'; input.style.padding='10px';
+  input.style.borderRadius='10px'; input.style.border='1px solid var(--stroke)';
+  input.style.background='rgba(255,255,255,.9)'; input.style.color='var(--ink-card)';
+
   const bar = document.createElement('div'); bar.style.display='flex'; bar.style.gap='8px'; bar.style.marginTop='10px';
   const btn = document.createElement('button'); btn.className='btn primary'; btn.textContent='提交';
   const reveal = document.createElement('button'); reveal.className='btn'; reveal.textContent='显示答案';
   const addWrong = document.createElement('button'); addWrong.className='btn'; addWrong.textContent='加入错题本 📌';
   bar.appendChild(btn); bar.appendChild(reveal); bar.appendChild(addWrong);
+
   const res = document.createElement('div'); res.className='hint'; res.style.marginTop='8px';
 
   btn.onclick = ()=>{
     const user = (input.value||'').trim();
     if(!user){ res.textContent='先输入你的翻译~'; return; }
-    const ans = quizItem.cn.replace(/[；;，,。]/g,' ');
+    const ans = (quizItem.cn||'').replace(/[；;，,。]/g,' ');
     let ok=false;
     const parts = ans.split(/\s+/).filter(Boolean);
     for(const p of parts){ if(p && user.includes(p)) { ok=true; break; } }
-    if(ok){ res.textContent='✅ 不错！'; confetti(); }
+    if(ok){ res.textContent='✅ 记得不错！'; confetti(); }
     else { res.textContent='❌ 再想想。正确答案：'+quizItem.cn; }
   };
   reveal.onclick = ()=>{ res.textContent='答案：'+quizItem.cn; };
@@ -645,157 +731,144 @@ function openQuiz(fromWrong=false, promptText='🎯 翻译挑战（输入中文�
   document.getElementById('quizModal').classList.add('show');
 }
 
-/* ───────────────────────── 错题本视图 ───────────────────────── */
-let inWrongMode = false;
-function getWrongDeck(){ return [...wrongBook].map(t=> base[map.get(t)]).filter(Boolean); }
-function enterWrong(){ inWrongMode = true; document.getElementById('deckTabBtn').style.display='inline-flex'; document.getElementById('wrongTabBtn').style.display='none'; currentRound=0; renderWords(); updateFooter(); }
-function leaveWrong(){ inWrongMode = false; document.getElementById('deckTabBtn').style.display='none'; document.getElementById('wrongTabBtn').style.display='inline-flex'; currentRound=0; renderWords(); updateFooter(); }
+/* 偶遇测验（随机弹出错题本词或例句） */
+let surpriseCooldown = false;
+function maybeSurprise(){
+  if (document.querySelector('.modal.show')) return; // 已有弹窗则不打断
+  if (wrongBook.size === 0) return;
+  if (surpriseCooldown) return;
 
-/* ───────────────────────── 显示/隐藏 & 随机 ───────────────────────── */
-function showAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.add('show')); }
-function hideAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.remove('show')); }
-function showAllZh(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.add('show')); }
-function hideAllZh(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.remove('show')); }
+  // 触发概率：词卡页 18%，例句页 12%
+  const p = inSentencesView ? 0.12 : 0.18;
+  if (Math.random() >= p) return;
 
-function updateFooter(){
-  const total = inWrongMode ? getWrongDeck().length : deck.length;
-  let rounds = Math.ceil(total/pageSize);
-  const wrongCount = wrongBook.size; document.getElementById('wrongCount').textContent = wrongCount;
+  surpriseCooldown = true;
 
-  if(inWrongMode && total===0){
-    document.getElementById('roundTotal').textContent = 0;
-    document.getElementById('roundIdx').textContent = 0;
-    document.getElementById('roundCount').textContent = 0;
-    setBar();
-    return;
+  if (Math.random() < 0.5){
+    openQuiz(true, '🫣 本单词还没有记熟哦，快来复习一下吧~');
+  } else {
+    const pool = getWrongDeck();
+    const item = pool[(Math.random()*pool.length)|0];
+    if(!item){ openQuiz(true, '🫣 本单词还没有记熟哦，快来复习一下吧~'); }
+    else {
+      const ex = Array.isArray(item.ex) ? item.ex : [];
+      document.getElementById('exTitle').textContent = `🫣 你还没背过我：${item.t}`;
+      const c = document.getElementById('exContent');
+      c.innerHTML = '';
+      const tip = document.createElement('div'); tip.className='hint';
+      tip.textContent = '点英文可发音，点译文可显示/隐藏';
+      const en = document.createElement('div'); en.className='en';
+      en.textContent = ex[0] || '(暂无例句)'; en.onclick = ()=> speak(en.textContent);
+      const zh = document.createElement('div'); zh.className = 'zh';
+      zh.textContent = ex[1] || '（译文暂缺，先自己猜猜）';
+      c.appendChild(tip); c.appendChild(en); c.appendChild(zh);
+      document.getElementById('exampleModal').classList.add('show');
+    }
   }
 
-  rounds = Math.max(1, rounds);
+  // 20秒冷却，避免过于频繁
+  setTimeout(()=>{ surpriseCooldown = false; }, 20000);
+}
+
+/* ───────────────────────── 其他控制 ───────────────────────── */
+function updateFooter(){
+  const total = inWrongMode ? getWrongDeck().length : deck.length;
+  const rounds = Math.max(1, Math.ceil(total / pageSize));
   document.getElementById('roundTotal').textContent = rounds;
-  const roundArr = inWrongMode ? chunk(getWrongDeck(), pageSize)[currentRound] || [] : chunk(deck, pageSize)[currentRound] || [];
+  const roundArr = inWrongMode
+    ? (chunk(getWrongDeck(), pageSize)[currentRound] || [])
+    : (chunk(deck, pageSize)[currentRound] || []);
   document.getElementById('roundCount').textContent = roundArr.length;
-  document.getElementById('roundIdx').textContent = (currentRound+1);
+  document.getElementById('roundIdx').textContent = currentRound + 1;
+  document.getElementById('wrongCount').textContent = wrongBook.size;
   setBar();
 }
 
-function prevRound(){ if(currentRound>0){ currentRound--; renderCurrent(); } }
+function prevRound(){
+  if(currentRound>0){ currentRound--; (inSentencesView?renderSentences():renderWords()); updateFooter(); maybeSurprise(); }
+}
 function nextRound(){
   const total = inWrongMode ? getWrongDeck().length : deck.length;
-  const rounds = Math.ceil(total/pageSize);
-  if(currentRound < rounds-1){ currentRound++; renderCurrent(); }
+  const rounds = Math.ceil(total / pageSize);
+  if(currentRound < rounds - 1){ currentRound++; (inSentencesView?renderSentences():renderWords()); updateFooter(); maybeSurprise(); }
 }
-function renderCurrent(){ if(inSentencesView) renderSentences(); else renderWords(); updateFooter(); maybeSurprise(); }
-function toggleView(){ inSentencesView? renderWords() : renderSentences(); maybeSurprise(); }
+function toggleView(){ inSentencesView ? renderWords() : renderSentences(); updateFooter(); maybeSurprise(); }
 
+function showAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.add('show')); }
+function hideAllCN(){ document.querySelectorAll('#grid .cn').forEach(el=>el.classList.remove('show')); }
+function showAllZhSent(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.add('show')); }
+function hideAllZhSent(){ document.querySelectorAll('#sentences .zh').forEach(el=>el.classList.remove('show')); }
+
+/* 洗牌：主词库与错题本分别维护各自顺序 */
+function resetDeck(){ deck = deckOrder.map(t=>base[map.get(t)]); }
 function shuffleDeck(){
   scrambled = !scrambled;
-  const arr = inWrongMode ? getWrongDeck() : deck;
-  if(scrambled){ arr.sort(()=>Math.random()-0.5); } else {
-    if(inWrongMode){ /* 错题本无原顺序，忽略 */ }
-    else {
-      while(deck.length) deck.pop();
-      deckOrder.forEach(t=> deck.push(base[map.get(t)]));
-    }
+  if(inWrongMode){
+    // 洗牌错题本顺序
+    wrongOrder = [...wrongBook];
+    if(scrambled) wrongOrder.sort(()=>Math.random()-0.5);
+  }else{
+    if(scrambled) deck.sort(()=>Math.random()-0.5);
+    else resetDeck();
   }
-  currentRound=0; renderCurrent();
+  currentRound = 0;
+  (inSentencesView?renderSentences():renderWords());
+  updateFooter();
+  maybeSurprise();
 }
 
-/* ───────────────────────── 小惊喜（彩纸） ───────────────────────── */
-function confetti(){
-  const b = document.getElementById('burst');
-  for(let i=0;i<32;i++){
-    const p=document.createElement('div'); p.className='piece';
-    const x = (window.innerWidth/2)+'px'; const y = '20%';
-    const x2 = (Math.random()*100)+'vw'; const y2 = (60+Math.random()*40)+'vh';
-    p.style.setProperty('--x', x); p.style.setProperty('--y', y); p.style.setProperty('--x2', x2); p.style.setProperty('--y2', y2);
-    p.style.background = `linear-gradient(${Math.random()*360}deg, var(--accent), var(--accent2))`;
-    p.style.left = (window.innerWidth/2)+'px'; p.style.top='10%';
-    b.appendChild(p); setTimeout(()=>p.remove(), 1000);
-  }
+/* 切换错题本视图 */
+function enterWrong(){
+  inWrongMode = true; currentRound = 0;
+  document.getElementById('deckTabBtn').style.display='inline-flex';
+  document.getElementById('wrongTabBtn').style.display='none';
+  if(scrambled) wrongOrder.sort(()=>Math.random()-0.5); else wrongOrder = [...wrongBook];
+  renderWords(); updateFooter();
 }
-let titleTap=0; document.getElementById('title').addEventListener('click',()=>{ titleTap++; if(titleTap>=3){ confetti(); titleTap=0; }});
-
-/* ───────────────────────── 偶遇测验（随机弹出错题提醒） ─────────────────────────
-   触发时机：切换回合/视图、点击词条时，有一定概率从【错题本】抽一道；
-   表现：用共用的 quizModal，标题改为“你还没背过我~”
-*/
-let surpriseCooldown = false;
-function maybeSurprise(){
-  // 如果还在冷却或错题本为空就不触发
-  if(surpriseCooldown) return;
-  if(wrongBook.size === 0) return;
-
-  const p = inSentencesView ? 0.12 : 0.18; // 触发概率：例句页低一点，词卡页高一点
-  if(Math.random() < p){
-    surpriseCooldown = true;
-
-    // 一半概率直接出“猜中文义”的 quiz（从错题本抽）
-    if(Math.random() < 0.5){
-      openQuiz(true, '🫣 你还没背过我——再猜猜我的意思吧');
-    } else {
-      // 另一半概率在例句弹窗展示【错题本里的条目】，但**不再生成例句**，直接使用 item.ex
-      const pool = getWrongDeck();
-      const item = pool[(Math.random() * pool.length) | 0];
-
-      // 如果选中的条目不存在或者没有 ex 字段，降级为 quiz（避免报错）
-      if(!item || !item.ex || !item.ex[0]){
-        // 优先使用该条目的 quiz（若 item 存在），否则随机 quiz
-        if(item) openQuiz(true, '🫣 你还没背过我——再猜猜我的意思吧');
-        else openQuiz(false, '🫣 你还没背过我——再猜猜我的意思吧');
-      } else {
-        // 直接用 item.ex（不生成、不覆盖）
-        document.getElementById('exTitle').textContent = `🫣 你还没背过我：${item.t}`;
-        const c = document.getElementById('exContent');
-        c.innerHTML = '';
-
-        const tip = document.createElement('div'); tip.className = 'hint';
-        tip.textContent = '点英文可发音，点译文可显示/隐藏';
-
-        const en = document.createElement('div'); en.className = 'en';
-        en.textContent = item.ex[0];
-        en.onclick = () => speak(item.ex[0]);
-
-        // 中文默认隐藏，点开才显示（鼓励先猜）
-        const zh = document.createElement('div'); zh.className = 'zh';
-        zh.textContent = (item.ex[1] && item.ex[1].length) ? item.ex[1] : '（译文暂缺，先自己猜猜）';
-        // 不自动展开，用户点英文或点译文时可以查看
-
-        c.appendChild(tip);
-        c.appendChild(en);
-        c.appendChild(zh);
-        document.getElementById('exampleModal').classList.add('show');
-      }
-    }
-
-    // 冷却 20 秒，避免频繁弹窗，需按需调整
-    setTimeout(()=>{ surpriseCooldown = false; }, 20000);
-  }
+function leaveWrong(){
+  inWrongMode = false; currentRound = 0;
+  document.getElementById('deckTabBtn').style.display='none';
+  document.getElementById('wrongTabBtn').style.display='inline-flex';
+  renderWords(); updateFooter();
 }
-
 
 /* ───────────────────────── 事件绑定 ───────────────────────── */
-window.addEventListener('load', ()=>{ renderWords(); updateFooter(); setTimeout(()=>speechSynthesis.getVoices(), 300); });
+window.addEventListener('load', ()=>{
+  renderWords();
+  updateFooter();
+  setTimeout(()=>speechSynthesis.getVoices(), 300); // 预热语音
+});
 
-document.getElementById('prevBtn').onclick = ()=>{ prevRound(); };
-document.getElementById('nextBtn').onclick = ()=>{ nextRound(); };
-document.getElementById('toggleViewBtn').onclick = ()=>{ toggleView(); };
+document.getElementById('prevBtn').onclick = prevRound;
+document.getElementById('nextBtn').onclick = nextRound;
+document.getElementById('toggleViewBtn').onclick = toggleView;
+
 document.getElementById('showAllBtn').onclick = showAllCN;
 document.getElementById('hideAllBtn').onclick = hideAllCN;
-document.getElementById('shuffleBtn').onclick = ()=>{ shuffleDeck(); };
-document.getElementById('wrongTabBtn').onclick = ()=>{ enterWrong(); };
-document.getElementById('deckTabBtn').onclick = ()=>{ leaveWrong(); };
-document.getElementById('miniGameBtn').onclick = ()=>{ openQuiz(false, '🎯 翻译挑战（输入中文义）'); };
+
+document.getElementById('shuffleBtn').onclick = shuffleDeck;
+document.getElementById('wrongTabBtn').onclick = enterWrong;
+document.getElementById('deckTabBtn').onclick = leaveWrong;
+
+document.getElementById('miniGameBtn').onclick = ()=>openQuiz(false, '🎯 翻译挑战（输入中文义）');
 document.getElementById('eggBtn').onclick = confetti;
 
-document.getElementById('shuffleSentBtn').onclick = ()=>{ renderSentences(); };
-document.getElementById('showAllZhSent').onclick = showAllZh;
-document.getElementById('hideAllZhSent').onclick = hideAllZh;
+document.getElementById('shuffleSentBtn').onclick = ()=>{ renderSentences(); maybeSurprise(); };
+document.getElementById('showAllZhSent').onclick = showAllZhSent;
+document.getElementById('hideAllZhSent').onclick = hideAllZhSent;
 
+/* 关闭弹窗（点击遮罩可关闭） */
 document.getElementById('closeEx').onclick = ()=>document.getElementById('exampleModal').classList.remove('show');
 document.getElementById('exampleModal').addEventListener('click', e=>{ if(e.target.id==='exampleModal') e.currentTarget.classList.remove('show'); });
 
 document.getElementById('closeQuiz').onclick = ()=>document.getElementById('quizModal').classList.remove('show');
 document.getElementById('quizModal').addEventListener('click', e=>{ if(e.target.id==='quizModal') e.currentTarget.classList.remove('show'); });
+
+/* 标题彩蛋：连点三次标题撒花 */
+let titleTap = 0;
+document.getElementById('title').addEventListener('click',()=>{
+  titleTap++; if(titleTap>=3){ confetti(); titleTap=0; }
+});
 </script>
 </body>
 </html>
