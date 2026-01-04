@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>西游记人物志｜清新蓝绿风</title>
+
+  <style>
+    :root{
+      --bg1:#e8fbf7;
+      --bg2:#e6f4ff;
+      --card:#ffffffcc;
+      --card2:#ffffffef;
+      --text:#12343b;
+      --muted:#4a6b73;
+      --brand:#13b7a6;
+      --brand2:#2aa5ff;
+      --line:#d3ece8;
+      --shadow: 0 14px 40px rgba(18, 52, 59, .12);
+      --shadow2: 0 8px 22px rgba(18, 52, 59, .10);
+      --radius: 18px;
+    }
+
+    [data-theme="dark"]{
+      --bg1:#061a1c;
+      --bg2:#06121c;
+      --card:#0b2327cc;
+      --card2:#0b2327f0;
+      --text:#e6ffff;
+      --muted:#b3d6d6;
+      --brand:#18d2be;
+      --brand2:#5fb3ff;
+      --line:#143a40;
+      --shadow: 0 18px 60px rgba(0, 0, 0, .35);
+      --shadow2: 0 10px 30px rgba(0, 0, 0, .28);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC","Microsoft YaHei", Arial;
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(19,183,166,.25), transparent 55%),
+        radial-gradient(1000px 600px at 90% 30%, rgba(42,165,255,.22), transparent 60%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* 背景波纹装饰 */
+    .waves{
+      position:fixed; inset:-120px -140px auto auto;
+      width:520px; height:520px;
+      background: radial-gradient(circle at center, rgba(19,183,166,.15), transparent 55%);
+      filter: blur(0px);
+      border-radius: 50%;
+      pointer-events:none;
+      animation: float 10s ease-in-out infinite;
+      mix-blend-mode: multiply;
+      opacity:.9;
+    }
+    .waves:after{
+      content:"";
+      position:absolute; inset:60px;
+      background: radial-gradient(circle at center, rgba(42,165,255,.16), transparent 60%);
+      border-radius: 50%;
+      animation: float2 12s ease-in-out infinite;
+    }
+    @keyframes float{
+      0%,100%{transform: translate(0,0) scale(1)}
+      50%{transform: translate(-14px, 16px) scale(1.03)}
+    }
+    @keyframes float2{
+      0%,100%{transform: translate(0,0) scale(1)}
+      50%{transform: translate(18px, -10px) scale(1.05)}
+    }
+
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.25));
+      border-bottom: 1px solid rgba(255,255,255,.35);
+    }
+    [data-theme="dark"] header{
+      background: linear-gradient(180deg, rgba(8,22,24,.72), rgba(8,22,24,.25));
+      border-bottom: 1px solid rgba(20,58,64,.6);
+    }
+
+    .wrap{max-width: 1100px; margin:0 auto; padding: 18px 18px;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+    }
+    .logo{
+      width:44px; height:44px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(19,183,166,.95), rgba(42,165,255,.85));
+      box-shadow: var(--shadow2);
+      position:relative;
+    }
+    .logo:before{
+      content:"";
+      position:absolute; inset:10px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,.75), rgba(255,255,255,.25));
+      transform: rotate(18deg);
+    }
+    h1{
+      margin:0; font-size: 18px; letter-spacing:.5px;
+    }
+    .subtitle{
+      margin:3px 0 0 0;
+      font-size: 12px; color:var(--muted);
+    }
+
+    .actions{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--line);
+      background: var(--card);
+      padding: 10px 12px;
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(18,52,59,.06);
+    }
+
+    .input{
+      width:min(340px, 70vw);
+      border:none; outline:none;
+      background: transparent;
+      color:var(--text);
+      font-size: 14px;
+    }
+    .btn{
+      border:none; cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(19,183,166,.95), rgba(42,165,255,.85));
+      color:white;
+      box-shadow: var(--shadow2);
+      transition: transform .15s ease, filter .15s ease;
+      font-size: 13px;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); filter: brightness(1.02);}
+    .btn:active{transform: translateY(0px); filter: brightness(.98);}
+
+    .btn.secondary{
+      background: var(--card);
+      color: var(--text);
+      border:1px solid var(--line);
+      box-shadow: 0 6px 18px rgba(18,52,59,.06);
+    }
+
+    main{padding: 16px 18px 40px;}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      max-width:1100px;
+      margin: 0 auto;
+    }
+
+    .panel{
+      grid-column: span 12;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding: 14px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      flex-wrap:wrap;
+    }
+    .filters{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+    }
+    .seg{
+      display:flex; gap:8px; flex-wrap:wrap;
+      padding: 6px;
+      background: rgba(255,255,255,.35);
+      border:1px solid rgba(255,255,255,.55);
+      border-radius: 999px;
+    }
+    [data-theme="dark"] .seg{
+      background: rgba(8,22,24,.25);
+      border:1px solid rgba(20,58,64,.6);
+    }
+    .seg button{
+      border:none; cursor:pointer;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      transition: background .15s ease, color .15s ease;
+      font-size: 13px;
+    }
+    .seg button[aria-pressed="true"]{
+      background: linear-gradient(135deg, rgba(19,183,166,.22), rgba(42,165,255,.18));
+      color: var(--text);
+      border:1px solid rgba(19,183,166,.22);
+    }
+
+    .stats{
+      font-size: 13px; color: var(--muted);
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px dashed rgba(19,183,166,.35);
+      background: rgba(255,255,255,.30);
+    }
+
+    .card{
+      grid-column: span 12;
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding: 14px 14px;
+      position:relative;
+      overflow:hidden;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    @media (min-width: 760px){
+      .card{grid-column: span 6;}
+    }
+    @media (min-width: 1020px){
+      .card{grid-column: span 4;}
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .tag{
+      display:inline-flex; align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(19,183,166,.28);
+      background: linear-gradient(135deg, rgba(19,183,166,.14), rgba(42,165,255,.10));
+      color: var(--muted);
+    }
+
+    .head{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      margin-bottom: 8px;
+    }
+    .name{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.3px;
+    }
+    .alias{
+      margin:4px 0 0 0;
+      font-size: 12px; color: var(--muted);
+    }
+    .desc{
+      margin: 10px 0 0 0;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .more{
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(19,183,166,.28);
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.6;
+      display:none;
+    }
+    .card[data-open="true"] .more{display:block;}
+
+    .cardActions{
+      margin-top: 12px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .ghost{
+      border:1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-size: 13px;
+      transition: background .15s ease;
+    }
+    .ghost:hover{background: rgba(255,255,255,.25);}
+    [data-theme="dark"] .ghost:hover{background: rgba(8,22,24,.22);}
+
+    .fav{
+      border:none;
+      border-radius: 999px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-size: 13px;
+      background: rgba(19,183,166,.12);
+      color: var(--text);
+      border: 1px solid rgba(19,183,166,.25);
+    }
+    .fav[aria-pressed="true"]{
+      background: linear-gradient(135deg, rgba(19,183,166,.35), rgba(42,165,255,.22));
+      border: 1px solid rgba(19,183,166,.40);
+    }
+
+    .drawer{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      width:min(420px, calc(100vw - 32px));
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transform: translateY(140%);
+      transition: transform .22s ease;
+      z-index: 20;
+    }
+    .drawer[data-open="true"]{transform: translateY(0);}
+    .drawerHead{
+      padding: 12px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(135deg, rgba(19,183,166,.14), rgba(42,165,255,.10));
+      border-bottom: 1px solid rgba(19,183,166,.18);
+    }
+    .drawerHead strong{font-size:14px;}
+    .drawerBody{padding: 10px 14px; max-height: 42vh; overflow:auto;}
+    .drawerItem{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 10px 10px;
+      border: 1px dashed rgba(19,183,166,.22);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,.22);
+    }
+    [data-theme="dark"] .drawerItem{background: rgba(8,22,24,.18);}
+
+    .tiny{font-size:12px; color:var(--muted); margin:0;}
+    .linkBtn{
+      border:none; cursor:pointer;
+      background: transparent;
+      color: var(--brand2);
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 10px;
+    }
+    .linkBtn:hover{background: rgba(42,165,255,.10);}
+
+    footer{
+      max-width:1100px;
+      margin: 0 auto;
+      padding: 12px 18px 30px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="waves" aria-hidden="true"></div>
+
+  <header>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>西游记人物志</h1>
+            <p class="subtitle">蓝绿色清新唯美风 · 搜索 / 筛选 / 收藏 / 展开交互</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="chip" title="输入关键词：姓名、别称、关键词">
+            <span style="opacity:.8">🔎</span>
+            <input id="q" class="input" placeholder="搜索人物：如 孙悟空 / 金箍棒 / 取经…" />
+          </div>
+          <button id="themeBtn" class="btn secondary" type="button">切换主题</button>
+          <button id="favBtn" class="btn" type="button">查看收藏</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="panel" aria-label="筛选与统计">
+        <div class="filters">
+          <div class="seg" role="group" aria-label="阵营筛选">
+            <button class="segBtn" data-filter="all" aria-pressed="true">全部</button>
+            <button class="segBtn" data-filter="team" aria-pressed="false">取经团队</button>
+            <button class="segBtn" data-filter="god" aria-pressed="false">神仙</button>
+            <button class="segBtn" data-filter="yao" aria-pressed="false">妖怪</button>
+          </div>
+          <button id="resetBtn" class="btn secondary" type="button">清空搜索</button>
+        </div>
+
+        <div class="stats">
+          <span class="pill">展示：<b id="countNow">0</b> / <span id="countAll">0</span></span>
+          <span class="pill">已收藏：<b id="countFav">0</b></span>
+          <span class="pill">提示：点卡片“展开”看更多</span>
+        </div>
+      </section>
+
+      <div id="cards" class="grid" style="grid-column: span 12; padding:0; gap:16px;"></div>
+    </div>
+  </main>
+
+  <div id="drawer" class="drawer" role="dialog" aria-label="收藏夹" aria-modal="false" data-open="false">
+    <div class="drawerHead">
+      <strong>收藏夹</strong>
+      <div style="display:flex; gap:8px;">
+        <button id="clearFavBtn" class="btn secondary" type="button">清空</button>
+        <button id="closeDrawerBtn" class="btn secondary" type="button">关闭</button>
+      </div>
+    </div>
+    <div id="drawerBody" class="drawerBody"></div>
+  </div>
+
+  <footer>
+    说明：本页为学习演示用途；人物简介为概述性质（可自行替换为更完整的版本）。交互与收藏使用浏览器本地存储（LocalStorage）。
+  </footer>
+
+  <script>
+    const DATA = [
+      {
+        id: "wukong",
+        name: "孙悟空",
+        alias: "齐天大圣 · 美猴王",
+        camp: "team",
+        tags: ["取经团队","斗战","机智"],
+        desc: "花果山出世，师承菩提祖师，手持如意金箍棒。护唐僧西行，遇妖降魔，性烈而重情义。",
+        more: "核心特点：战力强、反应快、敢担当。成长线：从“桀骜不驯”到“守护与克制”。代表物：金箍棒、筋斗云。"
+      },
+      {
+        id: "tangseng",
+        name: "唐僧",
+        alias: "玄奘 · 三藏法师",
+        camp: "team",
+        tags: ["取经团队","慈悲","信念"],
+        desc: "大唐高僧，奉旨西行取经。秉持慈悲与戒律，常以“正念”约束团队，意志坚定。",
+        more: "核心特点：道德坐标与目标感。局限：过度信任、易受迷惑。代表物：九环锡杖、袈裟。"
+      },
+      {
+        id: "bajie",
+        name: "猪八戒",
+        alias: "天蓬元帅 · 猪悟能",
+        camp: "team",
+        tags: ["取经团队","憨直","烟火气"],
+        desc: "前身为天蓬元帅，下界后随唐僧取经。好吃懒做却也真诚，关键时刻能扛事。",
+        more: "核心特点：人性化、接地气、在团队里缓冲冲突。代表物：九齿钉耙。"
+      },
+      {
+        id: "shaseng",
+        name: "沙僧",
+        alias: "卷帘大将 · 沙悟净",
+        camp: "team",
+        tags: ["取经团队","稳重","可靠"],
+        desc: "原为天庭卷帘大将，后随唐僧西行。少言寡语，善后勤与守护，是队伍的稳定器。",
+        more: "核心特点：耐心、执行力强、抗压。代表物：降妖宝杖。"
+      },
+      {
+        id: "guanyin",
+        name: "观音菩萨",
+        alias: "大慈大悲 · 普度众生",
+        camp: "god",
+        tags: ["神仙","慈悲","引导"],
+        desc: "取经工程的重要推动者之一，多次化险为夷，提供关键指引与资源配置。",
+        more: "核心特点：以慈悲为底色的“系统设计者”。常以点化、度化而非单纯武力解决矛盾。"
+      },
+      {
+        id: "juling",
+        name: "二郎神",
+        alias: "杨戬 · 清源妙道真君",
+        camp: "god",
+        tags: ["神仙","强者","克制"],
+        desc: "与孙悟空斗法旗鼓相当，代表天庭体系中强执行与强纪律的一面。",
+        more: "核心特点：冷静、原则性强、战术素养高。象征：与“野性力量”相对的“秩序力量”。"
+      },
+      {
+        id: "niumo",
+        name: "牛魔王",
+        alias: "平天大圣 · 妖王之雄",
+        camp: "yao",
+        tags: ["妖怪","豪强","人情网"],
+        desc: "妖界豪强，势力盘根错节。与悟空既有旧交也有对立，体现“江湖与利益”的纠葛。",
+        more: "核心特点：资源与联盟能力强。冲突点：权力、面子、阵营选择。"
+      },
+      {
+        id: "baigujing",
+        name: "白骨精",
+        alias: "三番变化 · 诡计之妖",
+        camp: "yao",
+        tags: ["妖怪","伪装","试探人心"],
+        desc: "善于幻化，以连环伪装试探取经团队的信任与判断，制造内部裂痕。",
+        more: "核心特点：心理战与信息不对称。主题：外部威胁如何激化内部矛盾。"
+      },
+      {
+        id: "huangfeng",
+        name: "黄风怪",
+        alias: "黄风岭 · 三昧神风",
+        camp: "yao",
+        tags: ["妖怪","控场","风沙"],
+        desc: "以神风见长，擅长拉开距离与控场，体现“环境能力”对战局的影响。",
+        more: "核心特点：范围技能与战场塑形。对应破解：借助更高层次力量与策略配合。"
+      }
+    ];
+
+    const $ = (s, el=document) => el.querySelector(s);
+    const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+
+    const cardsEl = $("#cards");
+    const qEl = $("#q");
+    const countNowEl = $("#countNow");
+    const countAllEl = $("#countAll");
+    const countFavEl = $("#countFav");
+    const drawerEl = $("#drawer");
+    const drawerBodyEl = $("#drawerBody");
+
+    const LS_KEY_FAV = "xiyou_favs_v1";
+    const LS_KEY_THEME = "xiyou_theme_v1";
+
+    let state = {
+      filter: "all",
+      q: "",
+      favs: loadFavs(),
+      theme: loadTheme()
+    };
+
+    function loadFavs(){
+      try{
+        const raw = localStorage.getItem(LS_KEY_FAV);
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){ return []; }
+    }
+    function saveFavs(){
+      localStorage.setItem(LS_KEY_FAV, JSON.stringify(state.favs));
+    }
+    function loadTheme(){
+      const t = localStorage.getItem(LS_KEY_THEME);
+      return t === "dark" ? "dark" : "light";
+    }
+    function saveTheme(){
+      localStorage.setItem(LS_KEY_THEME, state.theme);
+    }
+
+    function applyTheme(){
+      document.documentElement.setAttribute("data-theme", state.theme);
+      $("#themeBtn").textContent = state.theme === "dark" ? "切换到浅色" : "切换到深色";
+    }
+
+    function match(item){
+      const byFilter = state.filter === "all" ? true : item.camp === state.filter;
+      const kw = state.q.trim().toLowerCase();
+      if(!kw) return byFilter;
+
+      const hay = [
+        item.name, item.alias, item.desc, item.more,
+        ...(item.tags||[])
+      ].join(" ").toLowerCase();
+
+      return byFilter && hay.includes(kw);
+    }
+
+    function render(){
+      const list = DATA.filter(match);
+      countAllEl.textContent = DATA.length;
+      countNowEl.textContent = list.length;
+      countFavEl.textContent = state.favs.length;
+
+      cardsEl.innerHTML = list.map(item => {
+        const isFav = state.favs.includes(item.id);
+        return `
+          <article class="card" data-id="${item.id}" data-open="false">
+            <div class="head">
+              <div>
+                <h3 class="name">${item.name}</h3>
+                <p class="alias">${item.alias}</p>
+              </div>
+              <span class="tag">${campLabel(item.camp)}</span>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
+              ${(item.tags||[]).map(t=>`<span class="tag" style="border-style:dashed; opacity:.95">${t}</span>`).join("")}
+            </div>
+
+            <p class="desc">${item.desc}</p>
+            <div class="more">${item.more}</div>
+
+            <div class="cardActions">
+              <button class="ghost toggleMore" type="button">展开</button>
+              <button class="fav toggleFav" type="button" aria-pressed="${isFav}">
+                ${isFav ? "已收藏" : "收藏"}
+              </button>
+              <button class="ghost quickFind" type="button" title="一键搜索此人物关键词">同类关键词</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      bindCardEvents();
+      renderDrawer();
+    }
+
+    function campLabel(c){
+      if(c==="team") return "取经团队";
+      if(c==="god") return "神仙";
+      if(c==="yao") return "妖怪";
+      return "全部";
+    }
+
+    function bindCardEvents(){
+      $$(".toggleMore", cardsEl).forEach(btn=>{
+        btn.addEventListener("click", (e)=>{
+          const card = e.target.closest(".card");
+          const open = card.getAttribute("data-open") === "true";
+          card.setAttribute("data-open", String(!open));
+          e.target.textContent = open ? "展开" : "收起";
+        });
+      });
+
+      $$(".toggleFav", cardsEl).forEach(btn=>{
+        btn.addEventListener("click", (e)=>{
+          const card = e.target.closest(".card");
+          const id = card.getAttribute("data-id");
+          toggleFav(id);
+        });
+      });
+
+      $$(".quickFind", cardsEl).forEach(btn=>{
+        btn.addEventListener("click", (e)=>{
+          const card = e.target.closest(".card");
+          const id = card.getAttribute("data-id");
+          const item = DATA.find(x=>x.id===id);
+          // 取第一个 tag 作为快捷搜索词（你也可改成 name/alias）
+          const kw = (item.tags && item.tags[0]) ? item.tags[0] : item.name;
+          state.q = kw;
+          qEl.value = kw;
+          render();
+        });
+      });
+    }
+
+    function toggleFav(id){
+      const i = state.favs.indexOf(id);
+      if(i>=0) state.favs.splice(i,1);
+      else state.favs.unshift(id);
+      saveFavs();
+      render();
+    }
+
+    function renderDrawer(){
+      const favItems = state.favs.map(id => DATA.find(x=>x.id===id)).filter(Boolean);
+
+      drawerBodyEl.innerHTML = favItems.length ? favItems.map(it => `
+        <div class="drawerItem">
+          <div>
+            <div style="font-weight:600">${it.name}</div>
+            <p class="tiny">${it.alias}</p>
+          </div>
+          <button class="linkBtn" type="button" data-unfav="${it.id}">移除</button>
+        </div>
+      `).join("") : `
+        <p class="tiny">还没有收藏任何人物。回到卡片点“收藏”即可加入。</p>
+      `;
+
+      $$("[data-unfav]", drawerBodyEl).forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          toggleFav(btn.getAttribute("data-unfav"));
+        });
+      });
+    }
+
+    // 顶部：搜索
+    qEl.addEventListener("input", ()=>{
+      state.q = qEl.value;
+      render();
+    });
+
+    // 阵营筛选
+    $$(".segBtn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        state.filter = btn.dataset.filter;
+        $$(".segBtn").forEach(x=>x.setAttribute("aria-pressed","false"));
+        btn.setAttribute("aria-pressed","true");
+        render();
+      });
+    });
+
+    // 清空搜索
+    $("#resetBtn").addEventListener("click", ()=>{
+      state.q = "";
+      qEl.value = "";
+      render();
+    });
+
+    // 主题切换
+    $("#themeBtn").addEventListener("click", ()=>{
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      saveTheme();
+      applyTheme();
+    });
+
+    // 收藏抽屉
+    $("#favBtn").addEventListener("click", ()=>{
+      drawerEl.setAttribute("data-open", "true");
+    });
+    $("#closeDrawerBtn").addEventListener("click", ()=>{
+      drawerEl.setAttribute("data-open", "false");
+    });
+    $("#clearFavBtn").addEventListener("click", ()=>{
+      state.favs = [];
+      saveFavs();
+      render();
+    });
+
+    // 初始化
+    applyTheme();
+    render();
+  </script>
+</body>
+</html>
